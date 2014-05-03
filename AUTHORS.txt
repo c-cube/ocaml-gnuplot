@@ -1,0 +1,8 @@
+(* OASIS_START *)
+(* DO NOT EDIT (digest: 390b861a5071777fa49a638bdf76b604) *)
+Authors of gnuplot
+Oliver Gu <gu.oliver@yahoo.com>
+
+Current maintainers of gnuplot
+Oliver Gu <gu.oliver@yahoo.com>
+(* OASIS_STOP *)

@@ -1,0 +1,10 @@
+*.native
+*.byte
+*.log
+/setup.log
+/setup.data
+/setup.log
+/setup.data
+/_log
+/_build
+/API.docdir
