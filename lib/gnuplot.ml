@@ -291,7 +291,8 @@ module Gp = struct
     printf "Command: %s\n%!" cmd;
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
-    unset ?style ?range t
+    unset ?style ?range t;
+    flush t
 
   let plot ?style ?range ?output ?titles t data =
     plot_many ?style ?range ?output ?titles t [data]
