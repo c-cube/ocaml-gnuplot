@@ -82,6 +82,13 @@ module Series : sig
     -> float list
     -> t
 
+  val lines_xy
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (float * float) list
+    -> t
+
   val histogram
     :  ?title:string
     -> ?color:Color.t

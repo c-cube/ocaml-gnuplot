@@ -210,7 +210,8 @@ module Titles = struct
 end
 
 type data =
-| Data of float list
+| Data_Y of float list
+| Data_XY of (float * float) list
 | Func of string
 
 module Series = struct
@@ -223,7 +224,8 @@ module Series = struct
     let cmd =
       String.concat [
         (match data with
-        | Data _ -> " '-' using 1 with " ^ plot
+        | Data_Y _ -> " '-' using 1 with " ^ plot
+        | Data_XY _ -> " '-' using 1:2 with " ^ plot
         | Func f -> f)
         ; format_title title
         ; format_num_arg "lw" weight
@@ -233,10 +235,13 @@ module Series = struct
     { cmd; data; }
 
   let lines ?title ?color ?weight data =
-    create ?title ?color ?weight "lines" (Data data)
+    create ?title ?color ?weight "lines" (Data_Y data)
+
+  let lines_xy ?title ?color ?weight data =
+    create ?title ?color ?weight "lines" (Data_XY data)
 
   let histogram ?title ?color ?weight ?fill data =
-    create ?title ?color ?weight ?fill "histogram" (Data data)
+    create ?title ?color ?weight ?fill "histogram" (Data_Y data)
 
   let func ?title ?color ?weight ?fill f =
     create ?title ?color ?weight ?fill "" (Func f)
@@ -256,8 +261,12 @@ module Gp = struct
 
   let send_data t data =
     match data with
-    | Data data ->
-      List.iter data ~f:(fun x -> send_cmd t (Float.to_string x));
+    | Data_Y data ->
+      List.iter data ~f:(fun y -> send_cmd t (Float.to_string y));
+      send_cmd t "e"
+    | Data_XY data ->
+      List.iter data ~f:(fun (x, y) ->
+        send_cmd t (Float.to_string x ^" "^ Float.to_string y));
       send_cmd t "e"
     | _ -> ()
 
