@@ -1,8 +1,9 @@
 # OASIS_START
-# DO NOT EDIT (digest: 0b8edc5df3dbe5d151d032a8c9b8dfa3)
+# DO NOT EDIT (digest: 03c9ee7b35fa80ac061a656e40fe19c1)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
+true: annot, bin_annot
 <**/.svn>: -traverse
 <**/.svn>: not_hygienic
 ".bzr": -traverse
@@ -15,14 +16,14 @@
 "_darcs": not_hygienic
 # Library gnuplot
 "lib/gnuplot.cmxs": use_gnuplot
-<lib/*.ml{,i}>: pkg_core
-<lib/*.ml{,i}>: pkg_threads
+<lib/*.ml{,i,y}>: pkg_core
+<lib/*.ml{,i,y}>: pkg_threads
 # Executable gnuplot_test
 <examples/gnuplot_test.{native,byte}>: pkg_core
 <examples/gnuplot_test.{native,byte}>: pkg_threads
 <examples/gnuplot_test.{native,byte}>: use_gnuplot
-<examples/*.ml{,i}>: pkg_core
-<examples/*.ml{,i}>: pkg_threads
-<examples/*.ml{,i}>: use_gnuplot
+<examples/*.ml{,i,y}>: pkg_core
+<examples/*.ml{,i,y}>: pkg_threads
+<examples/*.ml{,i,y}>: use_gnuplot
 # OASIS_STOP
 <**/*.ml{,i}>: annot, warn_e, warn_r
