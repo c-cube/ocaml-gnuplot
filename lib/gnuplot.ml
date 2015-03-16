@@ -236,6 +236,7 @@ end
 type kind =
 | Lines
 | Points
+| Steps
 | Histogram
 
 type data =
@@ -255,6 +256,7 @@ module Series = struct
       match kind with
       | Lines -> "lines"
       | Points -> "points"
+      | Steps -> "steps"
       | Histogram -> "histogram"
     in
     let cmd =
@@ -293,6 +295,15 @@ module Series = struct
 
   let points_func ?title ?color ?weight ?fill f =
     create ?title ?color ?weight ?fill Points (Func f)
+
+  let steps ?title ?color ?weight data =
+    create ?title ?color ?weight Steps (Data_Y data)
+
+  let steps_xy ?title ?color ?weight data =
+    create ?title ?color ?weight Steps (Data_XY data)
+
+  let steps_timey ?title ?color ?weight data =
+    create ?title ?color ?weight Steps (Data_TimeY data)
 
   let histogram ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Histogram (Data_Y data)

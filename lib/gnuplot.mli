@@ -133,6 +133,27 @@ module Series : sig
     -> string
     -> t
 
+  val steps
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> float list
+    -> t
+
+  val steps_xy
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (float * float) list
+    -> t
+
+  val steps_timey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Time.t * float) list
+    -> t
+
   val histogram
     :  ?title:string
     -> ?color:Color.t
