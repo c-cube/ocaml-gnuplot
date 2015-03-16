@@ -20,7 +20,7 @@ let _ =
 
   (* Plot multiple different series into a single plot *)
   Gp.plot_many gp
-    [ Series.func ~title:"Sinus" ~color:`Yellow ~weight:3 "sin(x)"
+    [ Series.lines_func ~title:"Sinus" ~color:`Yellow ~weight:3 "sin(x)"
     ; Series.lines [2.; 1.; 2.; 5.]
       ~title:"Some plot" ~color:`Green ~weight:3
     ; Series.histogram [2.; 1.; 2.; 5.]

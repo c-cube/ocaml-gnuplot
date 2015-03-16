@@ -96,20 +96,20 @@ module Series : sig
     -> (Time.t * float) list
     -> t
 
+  val lines_func
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> ?fill:Style.t
+    -> string
+    -> t
+
   val histogram
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
     -> ?fill:Style.t
     -> float list
-    -> t
-
-  val func
-    :  ?title:string
-    -> ?color:Color.t
-    -> ?weight:int
-    -> ?fill:Style.t
-    -> string
     -> t
 end
 

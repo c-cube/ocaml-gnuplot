@@ -233,6 +233,10 @@ module Timefmtx = struct
     [command]
 end
 
+type kind =
+| Lines
+| Histogram
+
 type data =
 | Data_Y of float list
 | Data_XY of (float * float) list
@@ -245,12 +249,17 @@ module Series = struct
     data : data;
   }
 
-  let create ?title ?color ?weight ?fill plot data =
+  let create ?title ?color ?weight ?fill kind data =
+    let kind_text =
+      match kind with
+      | Lines -> "lines"
+      | Histogram -> "histogram"
+    in
     let cmd =
       String.concat [
         (match data with
-        | Data_Y _ -> " '-' using 1 with " ^ plot
-        | Data_XY _ | Data_TimeY _ -> " '-' using 1:2 with " ^ plot
+        | Data_Y _ -> " '-' using 1 with " ^ kind_text
+        | Data_XY _ | Data_TimeY _ -> " '-' using 1:2 with " ^ kind_text
         | Func f -> f)
         ; format_title title
         ; format_num_arg "lw" weight
@@ -260,19 +269,20 @@ module Series = struct
     { cmd; data; }
 
   let lines ?title ?color ?weight data =
-    create ?title ?color ?weight "lines" (Data_Y data)
+    create ?title ?color ?weight Lines (Data_Y data)
 
   let lines_xy ?title ?color ?weight data =
-    create ?title ?color ?weight "lines" (Data_XY data)
+    create ?title ?color ?weight Lines (Data_XY data)
 
   let lines_timey ?title ?color ?weight data =
-    create ?title ?color ?weight "lines" (Data_TimeY data)
+    create ?title ?color ?weight Lines (Data_TimeY data)
+
+  let lines_func ?title ?color ?weight ?fill f =
+    create ?title ?color ?weight ?fill Lines (Func f)
 
   let histogram ?title ?color ?weight ?fill data =
-    create ?title ?color ?weight ?fill "histogram" (Data_Y data)
+    create ?title ?color ?weight ?fill Histogram (Data_Y data)
 
-  let func ?title ?color ?weight ?fill f =
-    create ?title ?color ?weight ?fill "" (Func f)
 end
 
 module Gp = struct
@@ -352,5 +362,5 @@ module Gp = struct
     plot_many ?style ?range ?output ?titles t [data]
 
   let plot_func ?style ?range ?output ?titles t func =
-    plot_many ?style ?range ?output ?titles t [Series.func func]
+    plot_many ?style ?range ?output ?titles t [Series.lines_func func]
 end
