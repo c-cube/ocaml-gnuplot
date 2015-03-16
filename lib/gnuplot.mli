@@ -89,6 +89,13 @@ module Series : sig
     -> (float * float) list
     -> t
 
+  val lines_timey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Time.t * float) list
+    -> t
+
   val histogram
     :  ?title:string
     -> ?color:Color.t

@@ -78,6 +78,9 @@ module Internal_format = struct
       |> String.concat ~sep:","
     in
     sprintf "set %s (%s)" tics titles)
+
+  let format_time_for_xaxis =
+    format_arg (sprintf "set timefmt \"%s\" \nset xdata time")
 end
 open Internal_format
 
@@ -209,9 +212,31 @@ module Titles = struct
     [command]
 end
 
+module Timefmtx = struct
+  type t = {
+    format : string option;
+  }
+
+  let create ?format () = { format }
+
+  let to_cmd_list t =
+    let cmd =
+      [ format_time_for_xaxis t.format, "set xdata"]
+      |> List.filter ~f:(fun (s, _) -> s <> "")
+    in
+    let command = {
+      Command.
+      command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
+      cleanup = cmd |> List.map ~f:snd |> String.concat ~sep:"\n";
+    }
+    in
+    [command]
+end
+
 type data =
 | Data_Y of float list
 | Data_XY of (float * float) list
+| Data_TimeY of (Time.t * float) list
 | Func of string
 
 module Series = struct
@@ -225,7 +250,7 @@ module Series = struct
       String.concat [
         (match data with
         | Data_Y _ -> " '-' using 1 with " ^ plot
-        | Data_XY _ -> " '-' using 1:2 with " ^ plot
+        | Data_XY _ | Data_TimeY _ -> " '-' using 1:2 with " ^ plot
         | Func f -> f)
         ; format_title title
         ; format_num_arg "lw" weight
@@ -240,6 +265,9 @@ module Series = struct
   let lines_xy ?title ?color ?weight data =
     create ?title ?color ?weight "lines" (Data_XY data)
 
+  let lines_timey ?title ?color ?weight data =
+    create ?title ?color ?weight "lines" (Data_TimeY data)
+
   let histogram ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill "histogram" (Data_Y data)
 
@@ -248,16 +276,19 @@ module Series = struct
 end
 
 module Gp = struct
-  type t = out_channel
+  type t = {
+    channel : out_channel;
+    timefmt : string;
+  }
 
   let create ?path () =
     let path = Option.value path ~default:"gnuplot" in
-    let t = Unix.open_process_out path in
-    t
+    { channel = Unix.open_process_out path
+    ; timefmt = "%d-%b-%Y-%H:%M:%S" }
 
-  let send_cmd t cmd = output_string t (cmd^"\n")
+  let send_cmd t cmd = output_string t.channel (cmd^"\n")
 
-  let close t = ignore (Unix.close_process_out t)
+  let close t = ignore (Unix.close_process_out t.channel)
 
   let send_data t data =
     match data with
@@ -268,19 +299,27 @@ module Gp = struct
       List.iter data ~f:(fun (x, y) ->
         send_cmd t (Float.to_string x ^" "^ Float.to_string y));
       send_cmd t "e"
+    | Data_TimeY data ->
+      List.iter data ~f:(fun (tm, y) ->
+        send_cmd t (Time.format tm t.timefmt ^" "^ Float.to_string y));
+      send_cmd t "e"
     | _ -> ()
 
-  let set ?style ?range ?output ?titles t =
+  let internal_set ?style ?range ?output ?titles ?timefmtx t =
     let commands =
       List.concat
-        [ Option.value_map style  ~default:[] ~f:Style. to_cmd_list
-        ; Option.value_map range  ~default:[] ~f:Range. to_cmd_list
-        ; Option.value_map output ~default:[] ~f:Output.to_cmd_list
-        ; Option.value_map titles ~default:[] ~f:Titles.to_cmd_list ]
+        [ Option.value_map style    ~default:[] ~f:Style.to_cmd_list
+        ; Option.value_map range    ~default:[] ~f:Range.to_cmd_list
+        ; Option.value_map output   ~default:[] ~f:Output.to_cmd_list
+        ; Option.value_map titles   ~default:[] ~f:Titles.to_cmd_list
+        ; Option.value_map timefmtx ~default:[] ~f:Timefmtx.to_cmd_list]
     in
     List.iter commands ~f:(fun cmd ->
       printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
+
+  let set ?style ?range ?output ?titles t =
+    internal_set ?style ?range ?output ?titles t
 
   let unset ?style ?range t =
     let commands =
@@ -292,7 +331,13 @@ module Gp = struct
       if cmd.Command.cleanup <> "" then send_cmd t cmd.Command.cleanup)
 
   let plot_many ?style ?range ?output ?titles t data =
-    set ?style ?range ?output ?titles t;
+    begin match (List.hd_exn data).Series.data with
+    | Data_TimeY _ ->
+      let timefmtx = Timefmtx.create ~format:t.timefmt () in
+      internal_set ?style ?range ?output ?titles ~timefmtx t
+    | _ ->
+      internal_set ?style ?range ?output ?titles t
+    end;
     let cmd =
       "plot \\\n" ^
       (List.map data ~f:(fun s -> s.Series.cmd) |> String.concat ~sep:", \\\n")
@@ -301,7 +346,7 @@ module Gp = struct
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
     unset ?style ?range t;
-    flush t
+    flush t.channel
 
   let plot ?style ?range ?output ?titles t data =
     plot_many ?style ?range ?output ?titles t [data]
