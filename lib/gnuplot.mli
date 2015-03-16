@@ -104,6 +104,35 @@ module Series : sig
     -> string
     -> t
 
+  val points
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> float list
+    -> t
+
+  val points_xy
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (float * float) list
+    -> t
+
+  val points_timey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Time.t * float) list
+    -> t
+
+  val points_func
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> ?fill:Style.t
+    -> string
+    -> t
+
   val histogram
     :  ?title:string
     -> ?color:Color.t

@@ -235,6 +235,7 @@ end
 
 type kind =
 | Lines
+| Points
 | Histogram
 
 type data =
@@ -253,6 +254,7 @@ module Series = struct
     let kind_text =
       match kind with
       | Lines -> "lines"
+      | Points -> "points"
       | Histogram -> "histogram"
     in
     let cmd =
@@ -260,7 +262,7 @@ module Series = struct
         (match data with
         | Data_Y _ -> " '-' using 1 with " ^ kind_text
         | Data_XY _ | Data_TimeY _ -> " '-' using 1:2 with " ^ kind_text
-        | Func f -> f)
+        | Func f -> f ^ " with " ^ kind_text)
         ; format_title title
         ; format_num_arg "lw" weight
         ; format_color "lc" color
@@ -279,6 +281,18 @@ module Series = struct
 
   let lines_func ?title ?color ?weight ?fill f =
     create ?title ?color ?weight ?fill Lines (Func f)
+
+  let points ?title ?color ?weight data =
+    create ?title ?color ?weight Points (Data_Y data)
+
+  let points_xy ?title ?color ?weight data =
+    create ?title ?color ?weight Points (Data_XY data)
+
+  let points_timey ?title ?color ?weight data =
+    create ?title ?color ?weight Points (Data_TimeY data)
+
+  let points_func ?title ?color ?weight ?fill f =
+    create ?title ?color ?weight ?fill Points (Func f)
 
   let histogram ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Histogram (Data_Y data)
