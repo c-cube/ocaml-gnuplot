@@ -238,11 +238,13 @@ type kind =
 | Points
 | Steps
 | Histogram
+| Candlesticks
 
 type data =
 | Data_Y of float list
 | Data_XY of (float * float) list
 | Data_TimeY of (Time.t * float) list
+| Data_TimeOHLC of (Time.t * float * float * float * float) list
 | Func of string
 
 module Series = struct
@@ -258,12 +260,14 @@ module Series = struct
       | Points -> "points"
       | Steps -> "steps"
       | Histogram -> "histogram"
+      | Candlesticks -> "candlesticks"
     in
     let cmd =
       String.concat [
         (match data with
         | Data_Y _ -> " '-' using 1 with " ^ kind_text
         | Data_XY _ | Data_TimeY _ -> " '-' using 1:2 with " ^ kind_text
+        | Data_TimeOHLC _ -> " '-' using 1:2:3:4:5 with " ^ kind_text
         | Func f -> f ^ " with " ^ kind_text)
         ; format_title title
         ; format_num_arg "lw" weight
@@ -308,6 +312,9 @@ module Series = struct
   let histogram ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Histogram (Data_Y data)
 
+  let candlesticks ?title ?color ?weight ?fill data =
+    create ?title ?color ?weight ?fill Candlesticks (Data_TimeOHLC data)
+
 end
 
 module Gp = struct
@@ -338,6 +345,14 @@ module Gp = struct
       List.iter data ~f:(fun (tm, y) ->
         send_cmd t (Time.format tm t.timefmt ^" "^ Float.to_string y));
       send_cmd t "e"
+    | Data_TimeOHLC data ->
+      List.iter data ~f:(fun (tm, o, h, l, c) ->
+        send_cmd t (Time.format tm t.timefmt ^ " " ^
+                    Float.to_string o ^ " " ^
+                    Float.to_string h ^ " " ^
+                    Float.to_string l ^ " " ^
+                    Float.to_string c));
+      send_cmd t "e"
     | _ -> ()
 
   let internal_set ?style ?range ?output ?titles ?timefmtx t =
@@ -367,7 +382,7 @@ module Gp = struct
 
   let plot_many ?style ?range ?output ?titles t data =
     begin match (List.hd_exn data).Series.data with
-    | Data_TimeY _ ->
+    | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ~format:t.timefmt () in
       internal_set ?style ?range ?output ?titles ~timefmtx t
     | _ ->

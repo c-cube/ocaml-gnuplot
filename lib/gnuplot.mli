@@ -161,6 +161,14 @@ module Series : sig
     -> ?fill:Style.t
     -> float list
     -> t
+
+  val candlesticks
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> ?fill:Style.t
+    -> (Time.t * float * float * float * float) list
+    -> t
 end
 
 module Gp : sig
