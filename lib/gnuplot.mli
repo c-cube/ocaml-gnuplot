@@ -24,6 +24,7 @@
 open Core.Std
 
 module Color : sig
+  (* Possible colors of a plot. *)
   type t = [
   | `Black
   | `Red
@@ -38,6 +39,7 @@ module Color : sig
 end
 
 module Range : sig
+  (** Used for constructing ranges for the X axis, Y axis or both. *)
   type t =
   | X  of float * float
   | Y  of float * float
@@ -45,22 +47,31 @@ module Range : sig
 end
 
 module Style : sig
+  (** Represents possible fill styles of a plot. *)
   type t = [
-  | `Solid
-  | `Pattern of int
+  | `Solid           (* Fill the plot with a solid fill. *)
+  | `Pattern of int  (* Fill the plot with a pre-defined Gnuplot pattern. *)
   ]
 end
 
 module Output : sig
+  (** Specifies the output type for Gnuplot. *)
   type t
 
+  (** [create ?font output] creates an output type with optional [font]
+      parameter. *)
   val create
     :  ?font:string
-    -> [ `Wxt | `X11 | `Png of string | `Eps of string ]
+    -> [ `Wxt  (* Wxt terminal device generates output in a separate window. *)
+       | `X11  (* X11 terminal device for use with X servers. *)
+       | `Png of string  (* For saving charts to a PNG file. *)
+       | `Eps of string  (* For saving charts to an EPS file. *)
+       ]
     -> t
 end
 
 module Titles : sig
+  (** Specifies titles for the X and Y axes. *)
   type t
 
   val create
@@ -73,8 +84,10 @@ module Titles : sig
 end
 
 module Series : sig
+  (** Represents a series of data for the plot functions in the [Gp] module. *)
   type t
 
+  (** [lines data] creates a data series for a line plot of Y values. *)
   val lines
     :  ?title:string
     -> ?color:Color.t
@@ -82,6 +95,8 @@ module Series : sig
     -> float list
     -> t
 
+  (** [lines_xy data] creates a data series for a line plot of X and Y
+      values. *)
   val lines_xy
     :  ?title:string
     -> ?color:Color.t
@@ -89,6 +104,8 @@ module Series : sig
     -> (float * float) list
     -> t
 
+  (** [lines_xy data] creates a data series for a line plot of time and Y
+      values. *)
   val lines_timey
     :  ?title:string
     -> ?color:Color.t
@@ -96,6 +113,10 @@ module Series : sig
     -> (Time.t * float) list
     -> t
 
+  (** [lines_func f] creates a data series for a line plot of the values given
+      by a function [f] specified in the Gnuplot format, eg `sin(x)`.  The X
+      values come from the range object that was supplied to one of the
+      plot functions in the [Gp] module. *)
   val lines_func
     :  ?title:string
     -> ?color:Color.t
@@ -104,6 +125,7 @@ module Series : sig
     -> string
     -> t
 
+  (** [points data] creates a data series for a point plot of Y values. *)
   val points
     :  ?title:string
     -> ?color:Color.t
@@ -111,6 +133,8 @@ module Series : sig
     -> float list
     -> t
 
+  (** [points_xy data] creates a data series for a point plot of X and Y
+      values. *)
   val points_xy
     :  ?title:string
     -> ?color:Color.t
@@ -118,6 +142,8 @@ module Series : sig
     -> (float * float) list
     -> t
 
+  (** [points_xy data] creates a data series for a point plot of time and Y
+      values. *)
   val points_timey
     :  ?title:string
     -> ?color:Color.t
@@ -125,6 +151,10 @@ module Series : sig
     -> (Time.t * float) list
     -> t
 
+  (** [points_func f] creates a data series for a point plot of the values given
+      by a function [f] specified in the Gnuplot format, eg `sin(x)`.  The X
+      values come from the range object that was supplied to one of the plot
+      functions in the [Gp] module below. *)
   val points_func
     :  ?title:string
     -> ?color:Color.t
@@ -133,6 +163,7 @@ module Series : sig
     -> string
     -> t
 
+  (** [steps data] creates a data series for a step function of Y values. *)
   val steps
     :  ?title:string
     -> ?color:Color.t
@@ -140,6 +171,8 @@ module Series : sig
     -> float list
     -> t
 
+  (** [steps data] creates a data series for a step function of X and Y
+      values. *)
   val steps_xy
     :  ?title:string
     -> ?color:Color.t
@@ -147,6 +180,8 @@ module Series : sig
     -> (float * float) list
     -> t
 
+  (** [steps data] creates a data series for a step function of time and Y
+      values. *)
   val steps_timey
     :  ?title:string
     -> ?color:Color.t
@@ -154,6 +189,7 @@ module Series : sig
     -> (Time.t * float) list
     -> t
 
+  (** [histogram data] creates a data series for a histogram of Y values. *)
   val histogram
     :  ?title:string
     -> ?color:Color.t
@@ -162,6 +198,7 @@ module Series : sig
     -> float list
     -> t
 
+  (** [candlesticks data] creates a data series for a candlestick chart. *)
   val candlesticks
     :  ?title:string
     -> ?color:Color.t
@@ -172,12 +209,21 @@ module Series : sig
 end
 
 module Gp : sig
+  (** A wrapper for calling Gnuplot from OCaml. *)
   type t
 
-  val create : ?path:string -> unit -> t
+  (** [create ?path ()] creates a channel to a Gnuplot process where [path]
+      denotes the path to the Gnuplot command. *)
+  val create
+    :  ?path:string  (* defaults to `gnuplot` *)
+    -> unit
+    -> t
 
+  (** [close t] closes the channel to the Gnuplot process. *)
   val close : t -> unit
 
+  (** [set ?style ?range ?output ?titles t] sets parameters of the Gnuplot
+      session. *)
   val set
     :  ?style:Style.t
     -> ?range:Range.t
@@ -186,12 +232,15 @@ module Gp : sig
     -> t
     -> unit
 
+  (** [unset ?style ?range] resets the style or range of the Gnuplot session. *)
   val unset
     :  ?style:Style.t
     -> ?range:Range.t
     -> t
     -> unit
 
+  (** [plot t series] plots a single data [series].  The parameters for style,
+      range, etc are optional. *)
   val plot
     :  ?style:Style.t
     -> ?range:Range.t
@@ -201,6 +250,8 @@ module Gp : sig
     -> Series.t
     -> unit
 
+  (** [plot_many t series] creates a plot of multiple data [series].  The
+      parameters for style, range, etc are optional. *)
   val plot_many
     :  ?style:Style.t
     -> ?range:Range.t
@@ -210,6 +261,9 @@ module Gp : sig
     -> Series.t list
     -> unit
 
+  (** [plot_many t f] draws a graph of the function [f] given as a string.
+      The function [f] has to be specified in the Gnuplot format, eg `sin(x)`.
+      The parameters for the style, range, etc are optional. *)
   val plot_func
     :  ?style:Style.t
     -> ?range:Range.t
