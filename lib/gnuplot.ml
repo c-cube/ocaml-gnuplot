@@ -285,8 +285,8 @@ module Series = struct
   let lines_timey ?title ?color ?weight data =
     create ?title ?color ?weight Lines (Data_TimeY data)
 
-  let lines_func ?title ?color ?weight ?fill f =
-    create ?title ?color ?weight ?fill Lines (Func f)
+  let lines_func ?title ?color ?weight f =
+    create ?title ?color ?weight Lines (Func f)
 
   let points ?title ?color ?weight data =
     create ?title ?color ?weight Points (Data_Y data)
@@ -297,8 +297,8 @@ module Series = struct
   let points_timey ?title ?color ?weight data =
     create ?title ?color ?weight Points (Data_TimeY data)
 
-  let points_func ?title ?color ?weight ?fill f =
-    create ?title ?color ?weight ?fill Points (Func f)
+  let points_func ?title ?color ?weight f =
+    create ?title ?color ?weight Points (Func f)
 
   let steps ?title ?color ?weight data =
     create ?title ?color ?weight Steps (Data_Y data)

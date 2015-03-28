@@ -121,7 +121,6 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> ?fill:Style.t
     -> string
     -> t
 
@@ -159,7 +158,6 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> ?fill:Style.t
     -> string
     -> t
 
