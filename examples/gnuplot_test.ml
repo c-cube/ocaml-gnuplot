@@ -31,13 +31,12 @@ let _ =
 
   (* specify a range of the plot using 'range' named parameter *)
   Gp.plot_many gp
-    ~style:`Solid
-    ~range:(Range.XY (-0.5, 3.7, 0.0, 6.0))
+    ~fill:`Solid ~range:(Range.XY (-0.5, 3.7, 0.0, 6.0))
     [ Series.histogram [2.0; 1.0; 2.0; 5.0] ~color:`Green
     ; Series.histogram [1.5; 2.0; 2.5; 4.5] ~color:`Blue ];
 
   (* we can also change global properties using the 'set' method *)
-  Gp.set gp ~style:`Solid ~range:(Range.XY (-0.5, 3.7, 0.0, 6.0));
+  Gp.set gp ~fill:`Solid ~range:(Range.XY (-0.5, 3.7, 0.0, 6.0));
   (* and change the output to a 'png' file *)
   Gp.set gp ~output:(Output.create (`Png "test1.png"));
 

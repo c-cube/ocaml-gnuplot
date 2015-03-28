@@ -125,7 +125,7 @@ module Range = struct
     [command]
 end
 
-module Style = struct
+module Filling = struct
   type t = [
   | `Solid
   | `Pattern of int
@@ -355,10 +355,10 @@ module Gp = struct
       send_cmd t "e"
     | _ -> ()
 
-  let internal_set ?style ?range ?output ?titles ?timefmtx t =
+  let internal_set ?fill ?range ?output ?titles ?timefmtx t =
     let commands =
       List.concat
-        [ Option.value_map style    ~default:[] ~f:Style.to_cmd_list
+        [ Option.value_map fill     ~default:[] ~f:Filling.to_cmd_list
         ; Option.value_map range    ~default:[] ~f:Range.to_cmd_list
         ; Option.value_map output   ~default:[] ~f:Output.to_cmd_list
         ; Option.value_map titles   ~default:[] ~f:Titles.to_cmd_list
@@ -368,25 +368,25 @@ module Gp = struct
       printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
 
-  let set ?style ?range ?output ?titles t =
-    internal_set ?style ?range ?output ?titles t
+  let set ?fill ?range ?output ?titles t =
+    internal_set ?fill ?range ?output ?titles t
 
-  let unset ?style ?range t =
+  let unset ?fill ?range t =
     let commands =
       List.concat
-        [ Option.value_map style ~default:[] ~f:Style.to_cmd_list
+        [ Option.value_map fill  ~default:[] ~f:Filling.to_cmd_list
         ; Option.value_map range ~default:[] ~f:Range.to_cmd_list ]
     in
     List.iter commands ~f:(fun cmd ->
       if cmd.Command.cleanup <> "" then send_cmd t cmd.Command.cleanup)
 
-  let plot_many ?style ?range ?output ?titles t data =
+  let plot_many ?fill ?range ?output ?titles t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ~format:t.timefmt () in
-      internal_set ?style ?range ?output ?titles ~timefmtx t
+      internal_set ?fill ?range ?output ?titles ~timefmtx t
     | _ ->
-      internal_set ?style ?range ?output ?titles t
+      internal_set ?fill ?range ?output ?titles t
     end;
     let cmd =
       "plot \\\n" ^
@@ -395,12 +395,12 @@ module Gp = struct
     printf "Command: %s\n%!" cmd;
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
-    unset ?style ?range t;
+    unset ?fill ?range t;
     flush t.channel
 
-  let plot ?style ?range ?output ?titles t data =
-    plot_many ?style ?range ?output ?titles t [data]
+  let plot ?fill ?range ?output ?titles t data =
+    plot_many ?fill ?range ?output ?titles t [data]
 
-  let plot_func ?style ?range ?output ?titles t func =
-    plot_many ?style ?range ?output ?titles t [Series.lines_func func]
+  let plot_func ?fill ?range ?output ?titles t func =
+    plot_many ?fill ?range ?output ?titles t [Series.lines_func func]
 end

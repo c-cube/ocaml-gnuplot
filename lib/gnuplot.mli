@@ -46,8 +46,8 @@ module Range : sig
   | XY of float * float * float * float
 end
 
-module Style : sig
-  (** Represents possible fill styles of a plot. *)
+module Filling : sig
+  (** Represents possible fillings of a plot. *)
   type t = [
   | `Solid           (* Fill the plot with a solid fill. *)
   | `Pattern of int  (* Fill the plot with a pre-defined Gnuplot pattern. *)
@@ -192,7 +192,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> ?fill:Style.t
+    -> ?fill:Filling.t
     -> float list
     -> t
 
@@ -201,7 +201,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> ?fill:Style.t
+    -> ?fill:Filling.t
     -> (Time.t * float * float * float * float) list
     -> t
 end
@@ -220,27 +220,27 @@ module Gp : sig
   (** [close t] closes the channel to the Gnuplot process. *)
   val close : t -> unit
 
-  (** [set ?style ?range ?output ?titles t] sets parameters of the Gnuplot
+  (** [set ?fill ?range ?output ?titles t] sets parameters of the Gnuplot
       session. *)
   val set
-    :  ?style:Style.t
+    :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
     -> ?titles:Titles.t
     -> t
     -> unit
 
-  (** [unset ?style ?range] resets the style or range of the Gnuplot session. *)
+  (** [unset ?fill ?range] resets the filling or range of the Gnuplot session. *)
   val unset
-    :  ?style:Style.t
+    :  ?fill:Filling.t
     -> ?range:Range.t
     -> t
     -> unit
 
-  (** [plot t series] plots a single data [series].  The parameters for style,
+  (** [plot t series] plots a single data [series].  The parameters for filling,
       range, etc are optional. *)
   val plot
-    :  ?style:Style.t
+    :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
     -> ?titles:Titles.t
@@ -249,9 +249,9 @@ module Gp : sig
     -> unit
 
   (** [plot_many t series] creates a plot of multiple data [series].  The
-      parameters for style, range, etc are optional. *)
+      parameters for filling, range, etc are optional. *)
   val plot_many
-    :  ?style:Style.t
+    :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
     -> ?titles:Titles.t
@@ -261,9 +261,9 @@ module Gp : sig
 
   (** [plot_many t f] draws a graph of the function [f] given as a string.
       The function [f] has to be specified in the Gnuplot format, eg `sin(x)`.
-      The parameters for the style, range, etc are optional. *)
+      The parameters for the filling, range, etc are optional. *)
   val plot_func
-    :  ?style:Style.t
+    :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
     -> ?titles:Titles.t
