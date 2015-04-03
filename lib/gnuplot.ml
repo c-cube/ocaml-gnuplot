@@ -72,6 +72,8 @@ module Internal_format = struct
 
   let format_rotate s = format_arg (sprintf "set %s rotate by %d" s)
 
+  let format_label label = format_arg (fun s -> sprintf "set %s \"%s\"" label s)
+
   let format_titles tics = format_arg (fun list ->
     let titles =
       List.mapi list ~f:(fun n t -> sprintf "\"%s\" %d" t n)
@@ -179,6 +181,29 @@ module Output = struct
       Command.
       command = output;
       cleanup = "set term x11";
+    }
+    in
+    [command]
+end
+
+module Labels = struct
+  type t = {
+    x : string option;
+    y : string option;
+  }
+
+  let create ?x ?y () = { x; y; }
+
+  let to_cmd_list t =
+    let cmd =
+      [ format_label "xlabel" t.x, "set xlabel"
+      ; format_label "ylabel" t.y, "set ylabel"
+      ] |> List.filter ~f:(fun (s, _) -> s <> "")
+    in
+    let command = {
+      Command.
+      command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
+      cleanup = cmd |> List.map ~f:snd |> String.concat ~sep:"\n";
     }
     in
     [command]
@@ -355,12 +380,13 @@ module Gp = struct
       send_cmd t "e"
     | _ -> ()
 
-  let internal_set ?fill ?range ?output ?titles ?timefmtx t =
+  let internal_set ?fill ?range ?output ?labels ?titles ?timefmtx t =
     let commands =
       List.concat
         [ Option.value_map fill     ~default:[] ~f:Filling.to_cmd_list
         ; Option.value_map range    ~default:[] ~f:Range.to_cmd_list
         ; Option.value_map output   ~default:[] ~f:Output.to_cmd_list
+        ; Option.value_map labels   ~default:[] ~f:Labels.to_cmd_list
         ; Option.value_map titles   ~default:[] ~f:Titles.to_cmd_list
         ; Option.value_map timefmtx ~default:[] ~f:Timefmtx.to_cmd_list]
     in
@@ -368,8 +394,8 @@ module Gp = struct
       printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
 
-  let set ?fill ?range ?output ?titles t =
-    internal_set ?fill ?range ?output ?titles t
+  let set ?fill ?range ?output ?labels ?titles t =
+    internal_set ?fill ?range ?output ?labels ?titles t
 
   let unset ?fill ?range t =
     let commands =
@@ -380,13 +406,13 @@ module Gp = struct
     List.iter commands ~f:(fun cmd ->
       if cmd.Command.cleanup <> "" then send_cmd t cmd.Command.cleanup)
 
-  let plot_many ?fill ?range ?output ?titles t data =
+  let plot_many ?fill ?range ?output ?labels ?titles t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ~format:t.timefmt () in
-      internal_set ?fill ?range ?output ?titles ~timefmtx t
+      internal_set ?fill ?range ?output ?labels ?titles ~timefmtx t
     | _ ->
-      internal_set ?fill ?range ?output ?titles t
+      internal_set ?fill ?range ?output ?labels ?titles t
     end;
     let cmd =
       "plot \\\n" ^
@@ -398,9 +424,9 @@ module Gp = struct
     unset ?fill ?range t;
     flush t.channel
 
-  let plot ?fill ?range ?output ?titles t data =
-    plot_many ?fill ?range ?output ?titles t [data]
+  let plot ?fill ?range ?output ?labels ?titles t data =
+    plot_many ?fill ?range ?output ?labels ?titles t [data]
 
-  let plot_func ?fill ?range ?output ?titles t func =
-    plot_many ?fill ?range ?output ?titles t [Series.lines_func func]
+  let plot_func ?fill ?range ?output ?labels ?titles t func =
+    plot_many ?fill ?range ?output ?labels ?titles t [Series.lines_func func]
 end

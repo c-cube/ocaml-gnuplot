@@ -70,6 +70,17 @@ module Output : sig
     -> t
 end
 
+module Labels : sig
+  (* Specifies labels for the X and Y axes. *)
+  type t
+
+  val create
+    :  ?x:string
+    -> ?y:string
+    -> unit
+    -> t
+end
+
 module Titles : sig
   (** Specifies titles for the X and Y axes. *)
   type t
@@ -226,6 +237,7 @@ module Gp : sig
     :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
+    -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
     -> unit
@@ -243,6 +255,7 @@ module Gp : sig
     :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
+    -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
     -> Series.t
@@ -254,6 +267,7 @@ module Gp : sig
     :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
+    -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
     -> Series.t list
@@ -266,6 +280,7 @@ module Gp : sig
     :  ?fill:Filling.t
     -> ?range:Range.t
     -> ?output:Output.t
+    -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
     -> string
