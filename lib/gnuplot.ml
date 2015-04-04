@@ -345,12 +345,14 @@ end
 module Gp = struct
   type t = {
     channel : out_channel;
+    verbose : bool;
     timefmt : string;
   }
 
-  let create ?path () =
+  let create ?(verbose = false) ?path () =
     let path = Option.value path ~default:"gnuplot" in
     { channel = Unix.open_process_out path
+    ; verbose = verbose
     ; timefmt = "%Y-%m-%d-%H:%M:%S" }
 
   let send_cmd t cmd = output_string t.channel (cmd^"\n")
@@ -391,7 +393,7 @@ module Gp = struct
         ; Option.value_map timefmtx ~default:[] ~f:Timefmtx.to_cmd_list]
     in
     List.iter commands ~f:(fun cmd ->
-      printf "Setting:\n%s\n%!" cmd.Command.command;
+      if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
 
   let set ?fill ?range ?output ?labels ?titles t =
@@ -408,7 +410,7 @@ module Gp = struct
     in
     List.iter commands ~f:(fun cmd ->
       if cmd.Command.cleanup <> "" then begin
-        printf "Setting:\n%s\n%!" cmd.Command.cleanup;
+        if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.cleanup;
         send_cmd t cmd.Command.cleanup
       end)
 
@@ -424,7 +426,7 @@ module Gp = struct
       "plot \\\n" ^
       (List.map data ~f:(fun s -> s.Series.cmd) |> String.concat ~sep:", \\\n")
     in
-    printf "Command: %s\n%!" cmd;
+    if t.verbose then printf "Command: %s\n%!" cmd;
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
     unset ?fill ?range ?output ?labels ?titles t;

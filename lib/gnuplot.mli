@@ -221,10 +221,12 @@ module Gp : sig
   (** A wrapper for calling Gnuplot from OCaml. *)
   type t
 
-  (** [create ?path ()] creates a channel to a Gnuplot process where [path]
-      denotes the path to the Gnuplot command. *)
+  (** [create ?verbose ?path ()] creates a channel to a Gnuplot process with the
+      executable given by [path].  If [verbose] is true then plotting commands
+      print debug information on standard output. *)
   val create
-    :  ?path:string  (* defaults to `gnuplot` *)
+    :  ?verbose:bool (* defaults to false  *)
+    -> ?path:string  (* defaults to `gnuplot` *)
     -> unit
     -> t
 
