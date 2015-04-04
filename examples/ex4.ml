@@ -2,7 +2,7 @@ open Core.Std
 open Gnuplot
 open List_utils
 
-let _ = Random.init 100  (* for reproducability *)
+let () = Random.init 100  (* for reproducability *)
 
 (* The type of a bid in an auction. *)
 type bid =
@@ -37,9 +37,9 @@ let asks, bids =
   |> Tuple.T2.map2 ~f:List.rev
 ;;
 
-let _ =
+let () =
   let aggregate bids =
-    scan_list bids ~f:(fun b1 b2 ->
+    scan bids ~f:(fun b1 b2 ->
       { b1 with price = b2.price; volume = b1.volume + b2.volume }
     ) |> List.map ~f:(fun q -> float q.volume, float q.price)
   in

@@ -3,7 +3,7 @@ open Gnuplot
 
 let () =
   let gp = Gp.create () in
-  Gp.set ~output:(Output.create ~font:"arial" `Wxt) gp;
+  Gp.set gp ~output:(Output.create ~font:"arial" `Wxt);
   (* Plot lines and points. *)
   Gp.plot_many gp ~range:(Range.XY (-10., 10., -1.5, 1.5))
     [ Series.lines_func  "sin(x)" ~title:"Plot a line" ~color:`Blue

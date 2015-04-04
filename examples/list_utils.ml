@@ -11,7 +11,7 @@ let group_by l ~f =
   |> List.group ~break:(fun x1 x2 -> (f x1) <> (f x2))
 ;;
 
-let scan_list l ~f =
+let scan l ~f =
   let rec loop f y l =
     match l with
     | [] -> [y]

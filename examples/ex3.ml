@@ -2,6 +2,7 @@ open Core.Std
 open Gnuplot
 
 let () =
+  (* Generate random candlestick bars. *)
   let generate_bars ~num_bars =
     let next_bar tm cl =
       let tm = Time.add tm Time.Span.day in
@@ -25,8 +26,8 @@ let () =
     loop num_bars [] (tm, op, hi, lo, cl) |> List.rev
   in
   let gp = Gp.create () in
-  Gp.set ~output:(Output.create ~font:"arial" `Wxt) gp;
-  (* Plot a random series of candle sticks. *)
-  Gp.plot gp (Series.candlesticks (generate_bars ~num_bars:100));
+  Gp.set gp ~output:(Output.create ~font:"arial" `Wxt);
+  (* Plot a random candlestick chart. *)
+  Gp.plot gp (Series.candlesticks (generate_bars ~num_bars:100) ~title:"chart");
   Gp.close gp
 ;;
