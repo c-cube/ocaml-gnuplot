@@ -351,7 +351,7 @@ module Gp = struct
   let create ?path () =
     let path = Option.value path ~default:"gnuplot" in
     { channel = Unix.open_process_out path
-    ; timefmt = "%d-%b-%Y-%H:%M:%S" }
+    ; timefmt = "%Y-%m-%d-%H:%M:%S" }
 
   let send_cmd t cmd = output_string t.channel (cmd^"\n")
 
