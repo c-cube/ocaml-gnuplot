@@ -397,14 +397,20 @@ module Gp = struct
   let set ?fill ?range ?output ?labels ?titles t =
     internal_set ?fill ?range ?output ?labels ?titles t
 
-  let unset ?fill ?range t =
+  let unset ?fill ?range ?output ?labels ?titles t =
     let commands =
       List.concat
-        [ Option.value_map fill  ~default:[] ~f:Filling.to_cmd_list
-        ; Option.value_map range ~default:[] ~f:Range.to_cmd_list ]
+        [ Option.value_map fill   ~default:[] ~f:Filling.to_cmd_list
+        ; Option.value_map range  ~default:[] ~f:Range.to_cmd_list
+        ; Option.value_map output ~default:[] ~f:Output.to_cmd_list
+        ; Option.value_map labels ~default:[] ~f:Labels.to_cmd_list
+        ; Option.value_map titles ~default:[] ~f:Titles.to_cmd_list ]
     in
     List.iter commands ~f:(fun cmd ->
-      if cmd.Command.cleanup <> "" then send_cmd t cmd.Command.cleanup)
+      if cmd.Command.cleanup <> "" then begin
+        printf "Setting:\n%s\n%!" cmd.Command.cleanup;
+        send_cmd t cmd.Command.cleanup
+      end)
 
   let plot_many ?fill ?range ?output ?labels ?titles t data =
     begin match (List.hd_exn data).Series.data with
@@ -421,7 +427,7 @@ module Gp = struct
     printf "Command: %s\n%!" cmd;
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
-    unset ?fill ?range t;
+    unset ?fill ?range ?output ?labels ?titles t;
     flush t.channel
 
   let plot ?fill ?range ?output ?labels ?titles t data =

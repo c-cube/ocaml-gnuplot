@@ -242,10 +242,14 @@ module Gp : sig
     -> t
     -> unit
 
-  (** [unset ?fill ?range] resets the filling or range of the Gnuplot session. *)
+  (** [unset ?fill ?range ?output ?titles t] resets parameters of the Gnuplot
+      session. *)
   val unset
     :  ?fill:Filling.t
     -> ?range:Range.t
+    -> ?output:Output.t
+    -> ?labels:Labels.t
+    -> ?titles:Titles.t
     -> t
     -> unit
 
