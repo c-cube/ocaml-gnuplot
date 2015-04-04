@@ -107,24 +107,21 @@ module Range = struct
       cleanup = "set autoscale xy";
     }
 
-  let to_cmd_list t =
-    let command =
-      match t with
-      | X (fx, tx) ->
-        range
-          ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
-          ()
-      | Y (fy, ty) ->
-        range
-          ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
-          ()
-      | XY (fx, tx, fy, ty) ->
-        range
-          ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
-          ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
-          ()
-    in
-    [command]
+  let to_cmd t =
+    match t with
+    | X (fx, tx) ->
+      range
+        ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
+        ()
+    | Y (fy, ty) ->
+      range
+        ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
+        ()
+    | XY (fx, tx, fy, ty) ->
+      range
+        ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
+        ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
+        ()
 end
 
 module Filling = struct
@@ -133,18 +130,11 @@ module Filling = struct
   | `Pattern of int
   ]
 
-  let to_cmd_list t =
-    let cmd =
-      format_style t
-      |> sprintf "set style %s\n"
-    in
-    let command = {
-      Command.
-      command = cmd;
+  let to_cmd t =
+    { Command.
+      command = format_style t |> sprintf "set style %s\n";
       cleanup = "";
     }
-    in
-    [command]
 end
 
 module Output_type = struct
@@ -164,7 +154,7 @@ module Output = struct
 
   let create ?font output = { font; output; }
 
-  let to_cmd_list t =
+  let to_cmd t =
     let font = t.font |> format_arg (sprintf " font '%s'") in
     let output =
       match t.output with
@@ -177,13 +167,10 @@ module Output = struct
       | `Eps s ->
         sprintf "set term postscript eps enhanced%s\nset output '%s'" font s
     in
-    let command = {
-      Command.
+    { Command.
       command = output;
       cleanup = "set term x11";
     }
-    in
-    [command]
 end
 
 module Labels = struct
@@ -194,19 +181,16 @@ module Labels = struct
 
   let create ?x ?y () = { x; y; }
 
-  let to_cmd_list t =
+  let to_cmd t =
     let cmd =
       [ format_label "xlabel" t.x, "set xlabel"
       ; format_label "ylabel" t.y, "set ylabel"
       ] |> List.filter ~f:(fun (s, _) -> s <> "")
     in
-    let command = {
-      Command.
+    { Command.
       command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
       cleanup = cmd |> List.map ~f:snd |> String.concat ~sep:"\n";
     }
-    in
-    [command]
 end
 
 module Titles = struct
@@ -220,7 +204,7 @@ module Titles = struct
   let create ?x ?xrotate ?y ?yrotate () =
     { x; y; xrotate; yrotate; }
 
-  let to_cmd_list t =
+  let to_cmd t =
     let cmd =
       [ format_rotate "xtic" t.xrotate, "set xtic rotate by 0"
       ; format_rotate "ytic" t.yrotate, "set ytic rotate by 0"
@@ -228,13 +212,10 @@ module Titles = struct
       ; format_titles "ytics" t.y, "set ytics auto"
       ] |> List.filter ~f:(fun (s, _) -> s <> "")
     in
-    let command = {
-      Command.
+    { Command.
       command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
       cleanup = cmd |> List.map ~f:snd |> String.concat ~sep:"\n";
     }
-    in
-    [command]
 end
 
 module Timefmtx = struct
@@ -244,18 +225,15 @@ module Timefmtx = struct
 
   let create ?format () = { format }
 
-  let to_cmd_list t =
+  let to_cmd t =
     let cmd =
       [ format_time_for_xaxis t.format, "set xdata"]
       |> List.filter ~f:(fun (s, _) -> s <> "")
     in
-    let command = {
-      Command.
+    { Command.
       command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
       cleanup = cmd |> List.map ~f:snd |> String.concat ~sep:"\n";
     }
-    in
-    [command]
 end
 
 type kind =
@@ -384,13 +362,13 @@ module Gp = struct
 
   let internal_set ?fill ?range ?output ?labels ?titles ?timefmtx t =
     let commands =
-      List.concat
-        [ Option.value_map fill     ~default:[] ~f:Filling.to_cmd_list
-        ; Option.value_map range    ~default:[] ~f:Range.to_cmd_list
-        ; Option.value_map output   ~default:[] ~f:Output.to_cmd_list
-        ; Option.value_map labels   ~default:[] ~f:Labels.to_cmd_list
-        ; Option.value_map titles   ~default:[] ~f:Titles.to_cmd_list
-        ; Option.value_map timefmtx ~default:[] ~f:Timefmtx.to_cmd_list]
+      [ Option.map fill ~f:Filling.to_cmd
+      ; Option.map range ~f:Range.to_cmd
+      ; Option.map output ~f:Output.to_cmd
+      ; Option.map labels ~f:Labels.to_cmd
+      ; Option.map titles ~f:Titles.to_cmd
+      ; Option.map timefmtx ~f:Timefmtx.to_cmd
+      ] |> List.filter_map ~f:Fn.id
     in
     List.iter commands ~f:(fun cmd ->
       if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
@@ -401,12 +379,12 @@ module Gp = struct
 
   let unset ?fill ?range ?output ?labels ?titles t =
     let commands =
-      List.concat
-        [ Option.value_map fill   ~default:[] ~f:Filling.to_cmd_list
-        ; Option.value_map range  ~default:[] ~f:Range.to_cmd_list
-        ; Option.value_map output ~default:[] ~f:Output.to_cmd_list
-        ; Option.value_map labels ~default:[] ~f:Labels.to_cmd_list
-        ; Option.value_map titles ~default:[] ~f:Titles.to_cmd_list ]
+      [ Option.map fill ~f:Filling.to_cmd
+      ; Option.map range ~f:Range.to_cmd
+      ; Option.map output ~f:Output.to_cmd
+      ; Option.map labels ~f:Labels.to_cmd
+      ; Option.map titles ~f:Titles.to_cmd
+      ] |> List.filter_map ~f:Fn.id
     in
     List.iter commands ~f:(fun cmd ->
       if cmd.Command.cleanup <> "" then begin
