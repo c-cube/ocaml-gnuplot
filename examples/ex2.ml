@@ -13,7 +13,6 @@ let () =
     List.init 1000 ~f:(fun _ -> box_muller (Random.float 1.) (Random.float 1.))
   in
   let gp = Gp.create () in
-  Gp.set gp ~output:(Output.create ~font:"arial" `Wxt);
   (* Scatter plot of a bivariate normal distribution. *)
   Gp.plot gp ~range:(Range.XY (-4., 4., -4., 4.))
     (Series.points_xy (generate_noise ()) ~title:"2D Gaussian noise");

@@ -26,7 +26,6 @@ let () =
     loop num_bars [] (tm, op, hi, lo, cl) |> List.rev
   in
   let gp = Gp.create () in
-  Gp.set gp ~output:(Output.create ~font:"arial" `Wxt);
   (* Plot a random candlestick chart. *)
   Gp.plot gp (Series.candlesticks (generate_bars ~num_bars:100) ~title:"chart");
   Gp.close gp

@@ -44,7 +44,6 @@ let () =
     ) |> List.map ~f:(fun q -> float q.volume, float q.price)
   in
   let gp = Gp.create () in
-  Gp.set gp ~output:(Output.create ~font:"arial" `Wxt);
   (* Plot supply and demand curve. *)
   Gp.plot_many gp ~labels:(Labels.create ~x:"Volume" ~y:"Price" ())
     [ Series.steps_xy (aggregate asks) ~title:"Sell" ~color:`Green
