@@ -171,6 +171,8 @@ module Output = struct
       command = output;
       cleanup = "set term x11";
     }
+
+  let default_cmd = to_cmd { font = Some "arial"; output = `Wxt }
 end
 
 module Labels = struct
@@ -360,11 +362,12 @@ module Gp = struct
       send_cmd t "e"
     | _ -> ()
 
-  let internal_set ?fill ?range ?output ?labels ?titles ?timefmtx t =
+  let internal_set ?output ?fill ?range ?labels ?titles ?timefmtx t =
     let commands =
-      [ Option.map fill ~f:Filling.to_cmd
+      [ Option.value_map output ~f:Output.to_cmd
+          ~default:Output.default_cmd |> Option.some
+      ; Option.map fill ~f:Filling.to_cmd
       ; Option.map range ~f:Range.to_cmd
-      ; Option.map output ~f:Output.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
       ; Option.map titles ~f:Titles.to_cmd
       ; Option.map timefmtx ~f:Timefmtx.to_cmd
@@ -374,14 +377,14 @@ module Gp = struct
       if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
 
-  let set ?fill ?range ?output ?labels ?titles t =
-    internal_set ?fill ?range ?output ?labels ?titles t
+  let set ?output ?fill ?range ?labels ?titles t =
+    internal_set ?output ?fill ?range ?labels ?titles t
 
-  let unset ?fill ?range ?output ?labels ?titles t =
+  let unset ?fill ?range ?labels ?titles t =
     let commands =
-      [ Option.map fill ~f:Filling.to_cmd
+      [ Output.default_cmd |> Option.some (* Use default cleanup command *)
+      ; Option.map fill ~f:Filling.to_cmd
       ; Option.map range ~f:Range.to_cmd
-      ; Option.map output ~f:Output.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
       ; Option.map titles ~f:Titles.to_cmd
       ] |> List.filter_map ~f:Fn.id
@@ -392,7 +395,7 @@ module Gp = struct
         send_cmd t cmd.Command.cleanup
       end)
 
-  let plot_many ?fill ?range ?output ?labels ?titles t data =
+  let plot_many ?output ?fill ?range ?labels ?titles t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ~format:t.timefmt () in
@@ -407,12 +410,12 @@ module Gp = struct
     if t.verbose then printf "Command: %s\n%!" cmd;
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
-    unset ?fill ?range ?output ?labels ?titles t;
+    unset ?fill ?range ?labels ?titles t;
     flush t.channel
 
-  let plot ?fill ?range ?output ?labels ?titles t data =
+  let plot ?output ?fill ?range ?labels ?titles t data =
     plot_many ?fill ?range ?output ?labels ?titles t [data]
 
-  let plot_func ?fill ?range ?output ?labels ?titles t func =
+  let plot_func ?output ?fill ?range ?labels ?titles t func =
     plot_many ?fill ?range ?output ?labels ?titles t [Series.lines_func func]
 end

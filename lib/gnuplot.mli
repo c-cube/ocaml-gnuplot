@@ -233,23 +233,22 @@ module Gp : sig
   (** [close t] closes the channel to the Gnuplot process. *)
   val close : t -> unit
 
-  (** [set ?fill ?range ?output ?titles t] sets parameters of the Gnuplot
+  (** [set ?output ?fill ?range ?titles t] sets parameters of the Gnuplot
       session. *)
   val set
-    :  ?fill:Filling.t
+    :  ?output:Output.t  (* Wxt is default terminal *)
+    -> ?fill:Filling.t
     -> ?range:Range.t
-    -> ?output:Output.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
     -> unit
 
-  (** [unset ?fill ?range ?output ?titles t] resets parameters of the Gnuplot
+  (** [unset ?fill ?range ?titles t] resets parameters of the Gnuplot
       session. *)
   val unset
     :  ?fill:Filling.t
     -> ?range:Range.t
-    -> ?output:Output.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
@@ -258,9 +257,9 @@ module Gp : sig
   (** [plot t series] plots a single data [series].  The parameters for filling,
       range, etc are optional. *)
   val plot
-    :  ?fill:Filling.t
+    :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    -> ?fill:Filling.t
     -> ?range:Range.t
-    -> ?output:Output.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
@@ -270,9 +269,9 @@ module Gp : sig
   (** [plot_many t series] creates a plot of multiple data [series].  The
       parameters for filling, range, etc are optional. *)
   val plot_many
-    :  ?fill:Filling.t
+    :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    -> ?fill:Filling.t
     -> ?range:Range.t
-    -> ?output:Output.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
@@ -283,9 +282,9 @@ module Gp : sig
       The function [f] has to be specified in the Gnuplot format, eg `sin(x)`.
       The parameters for the filling, range, etc are optional. *)
   val plot_func
-    :  ?fill:Filling.t
+    :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    -> ?fill:Filling.t
     -> ?range:Range.t
-    -> ?output:Output.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
