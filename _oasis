@@ -24,13 +24,6 @@ Library gnuplot
   BuildDepends:    core, threads
   CompiledObject:  best
 
-Executable gnuplot_test
-  Path:            examples
-  MainIs:          gnuplot_test.ml
-  Install:         false
-  BuildDepends:    gnuplot
-  CompiledObject:  best
-
 # Documentation
 
 Document API
