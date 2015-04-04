@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 03c9ee7b35fa80ac061a656e40fe19c1)
+# DO NOT EDIT (digest: 634f2e2aea84d17448b1bf98cfea42f8)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -18,10 +18,22 @@ true: annot, bin_annot
 "lib/gnuplot.cmxs": use_gnuplot
 <lib/*.ml{,i,y}>: pkg_core
 <lib/*.ml{,i,y}>: pkg_threads
-# Executable gnuplot_test
-<examples/gnuplot_test.{native,byte}>: pkg_core
-<examples/gnuplot_test.{native,byte}>: pkg_threads
-<examples/gnuplot_test.{native,byte}>: use_gnuplot
+# Executable ex1
+<examples/ex1.{native,byte}>: pkg_core
+<examples/ex1.{native,byte}>: pkg_threads
+<examples/ex1.{native,byte}>: use_gnuplot
+# Executable ex2
+<examples/ex2.{native,byte}>: pkg_core
+<examples/ex2.{native,byte}>: pkg_threads
+<examples/ex2.{native,byte}>: use_gnuplot
+# Executable ex3
+<examples/ex3.{native,byte}>: pkg_core
+<examples/ex3.{native,byte}>: pkg_threads
+<examples/ex3.{native,byte}>: use_gnuplot
+# Executable ex4
+<examples/ex4.{native,byte}>: pkg_core
+<examples/ex4.{native,byte}>: pkg_threads
+<examples/ex4.{native,byte}>: use_gnuplot
 <examples/*.ml{,i,y}>: pkg_core
 <examples/*.ml{,i,y}>: pkg_threads
 <examples/*.ml{,i,y}>: use_gnuplot

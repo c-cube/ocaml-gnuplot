@@ -15,6 +15,12 @@ XStdFilesREADME:   false
 BuildTools:        ocamlbuild, ocamldoc
 PostDistcleanCommand: $rm test1.png
 
+# Flags
+
+Flag examples
+  Description:    Build all examples
+  Default:        false
+
 # Library
 
 Library gnuplot
@@ -22,6 +28,40 @@ Library gnuplot
   FindlibName:     gnuplot
   Modules:         Gnuplot
   BuildDepends:    core, threads
+  CompiledObject:  best
+
+# Examples
+
+Executable ex1
+  Build$:          flag(examples)
+  Path:            examples
+  MainIs:          ex1.ml
+  Install:         false
+  BuildDepends:    gnuplot
+  CompiledObject:  best
+
+Executable ex2
+  Build$:          flag(examples)
+  Path:            examples
+  MainIs:          ex2.ml
+  Install:         false
+  BuildDepends:    gnuplot
+  CompiledObject:  best
+
+Executable ex3
+  Build$:          flag(examples)
+  Path:            examples
+  MainIs:          ex3.ml
+  Install:         false
+  BuildDepends:    gnuplot
+  CompiledObject:  best
+
+Executable ex4
+  Build$:          flag(examples)
+  Path:            examples
+  MainIs:          ex4.ml
+  Install:         false
+  BuildDepends:    gnuplot
   CompiledObject:  best
 
 # Documentation
