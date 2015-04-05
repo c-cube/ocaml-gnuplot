@@ -213,7 +213,7 @@ module Series : sig
     -> ?color:Color.t
     -> ?weight:int
     -> ?fill:Filling.t
-    -> (Time.t * float * float * float * float) list
+    -> (Time.t * (float * float * float * float)) list
     -> t
 end
 

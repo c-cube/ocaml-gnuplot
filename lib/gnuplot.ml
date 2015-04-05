@@ -249,7 +249,7 @@ type data =
 | Data_Y of float list
 | Data_XY of (float * float) list
 | Data_TimeY of (Time.t * float) list
-| Data_TimeOHLC of (Time.t * float * float * float * float) list
+| Data_TimeOHLC of (Time.t * (float * float * float * float)) list
 | Func of string
 
 module Series = struct
@@ -353,7 +353,7 @@ module Gp = struct
         send_cmd t (Time.format tm t.timefmt ^" "^ Float.to_string y));
       send_cmd t "e"
     | Data_TimeOHLC data ->
-      List.iter data ~f:(fun (tm, o, h, l, c) ->
+      List.iter data ~f:(fun (tm, (o, h, l, c)) ->
         send_cmd t (Time.format tm t.timefmt ^ " " ^
                     Float.to_string o ^ " " ^
                     Float.to_string h ^ " " ^
