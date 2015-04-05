@@ -382,8 +382,7 @@ module Gp = struct
 
   let unset ?fill ?range ?labels ?titles t =
     let commands =
-      [ Output.default_cmd |> Option.some (* Use default cleanup command *)
-      ; Option.map fill ~f:Filling.to_cmd
+      [ Option.map fill ~f:Filling.to_cmd
       ; Option.map range ~f:Range.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
       ; Option.map titles ~f:Titles.to_cmd
