@@ -17,4 +17,3 @@ let () =
   Gp.plot gp ~range:(Range.XY (-4., 4., -4., 4.))
     (Series.points_xy (generate_noise ()) ~title:"2D Gaussian noise");
   Gp.close gp
-;;

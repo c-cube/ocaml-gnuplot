@@ -8,4 +8,3 @@ let () =
     [ Series.lines_func  "sin(x)" ~title:"Plot a line" ~color:`Blue
     ; Series.points_func "cos(x)" ~title:"Plot points" ~color:`Green ];
   Gp.close gp
-;;

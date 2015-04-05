@@ -49,4 +49,3 @@ let () =
     [ Series.steps_xy (aggregate asks) ~title:"Sell" ~color:`Green
     ; Series.steps_xy (aggregate bids) ~title:"Buy" ~color:`Red ];
   Gp.close gp
-;;

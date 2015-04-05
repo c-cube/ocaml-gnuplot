@@ -35,4 +35,3 @@ let () =
   (* Plot a random candlestick chart. *)
   Gp.plot gp (Series.candlesticks (gen_data ()) ~title:"chart");
   Gp.close gp
-;;
