@@ -14,6 +14,7 @@ let () =
   in
   let gp = Gp.create () in
   (* Scatter plot of a bivariate normal distribution. *)
-  Gp.plot gp ~range:(Range.XY (-4., 4., -4., 4.))
-    (Series.points_xy (generate_noise ()) ~title:"2D Gaussian noise");
+  Gp.set gp ~use_grid:true ~title:"2D Gaussian noise";
+  Gp.plot gp ~range:(Range.XY (-4., 4., -4., 4.)) ~use_grid:true
+    (Series.points_xy (generate_noise ()) ~title:"data points");
   Gp.close gp
