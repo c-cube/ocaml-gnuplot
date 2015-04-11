@@ -45,6 +45,7 @@ let () =
   in
   let gp = Gp.create () in
   (* Plot supply and demand curve. *)
+  Gp.set gp ~title:"Supply and Demand";
   Gp.plot_many gp ~labels:(Labels.create ~x:"Volume" ~y:"Price" ())
     [ Series.steps_xy (aggregate asks) ~title:"Sell" ~color:`Green
     ; Series.steps_xy (aggregate bids) ~title:"Buy" ~color:`Red ];
