@@ -60,6 +60,8 @@ module Internal_format = struct
     | None -> ""
     | Some a -> f a
 
+  let format_plot_title = format_arg (sprintf "set title \"%s\"")
+
   let format_title = format_arg (sprintf " t '%s'")
 
   let format_color s = format_arg (fun (color : Color.t) ->
@@ -176,6 +178,20 @@ module Output = struct
     }
 
   let default_cmd = to_cmd { font = Some "arial"; output = `Wxt }
+end
+
+module Title = struct
+  type t = {
+    title : string option;
+  }
+
+  let create ?title () = { title }
+
+  let to_cmd t =
+    { Command.
+      command = format_plot_title t.title;
+      cleanup = "unset title";
+    }
 end
 
 module Labels = struct
@@ -365,10 +381,11 @@ module Gp = struct
       send_cmd t "e"
     | _ -> ()
 
-  let internal_set ?output ?fill ?range ?labels ?titles ?timefmtx t =
+  let internal_set ?output ?title ?fill ?range ?labels ?titles ?timefmtx t =
     let commands =
       [ Option.value_map output ~f:Output.to_cmd
           ~default:Output.default_cmd |> Option.some
+      ; Option.map title ~f:(fun title -> Title.(create ~title () |> to_cmd))
       ; Option.map fill ~f:Filling.to_cmd
       ; Option.map range ~f:Range.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
@@ -380,8 +397,8 @@ module Gp = struct
       if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
 
-  let set ?output ?fill ?range ?labels ?titles t =
-    internal_set ?output ?fill ?range ?labels ?titles t
+  let set ?output ?title ?fill ?range ?labels ?titles t =
+    internal_set ?output ?title ?fill ?range ?labels ?titles t
 
   let unset ?fill ?range ?labels ?titles t =
     let commands =
@@ -397,13 +414,13 @@ module Gp = struct
         send_cmd t cmd.Command.cleanup
       end)
 
-  let plot_many ?output ?fill ?range ?labels ?titles t data =
+  let plot_many ?output ?title ?fill ?range ?labels ?titles t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ~format:t.timefmt () in
-      internal_set ?fill ?range ?output ?labels ?titles ~timefmtx t
+      internal_set ?output ?title ?fill ?range ?labels ?titles ~timefmtx t
     | _ ->
-      internal_set ?fill ?range ?output ?labels ?titles t
+      internal_set ?output ?title ?fill ?range ?labels ?titles t
     end;
     let cmd =
       "plot \\\n" ^
@@ -415,9 +432,9 @@ module Gp = struct
     unset ?fill ?range ?labels ?titles t;
     flush t.channel
 
-  let plot ?output ?fill ?range ?labels ?titles t data =
-    plot_many ?fill ?range ?output ?labels ?titles t [data]
+  let plot ?output ?title ?fill ?range ?labels ?titles t data =
+    plot_many ?title ?fill ?range ?output ?labels ?titles t [data]
 
-  let plot_func ?output ?fill ?range ?labels ?titles t func =
-    plot_many ?fill ?range ?output ?labels ?titles t [Series.lines_func func]
+  let plot_func ?output ?title ?fill ?range ?labels ?titles t func =
+    plot_many ?title ?fill ?range ?output ?labels ?titles t [Series.lines_func func]
 end

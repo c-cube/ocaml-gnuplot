@@ -234,10 +234,11 @@ module Gp : sig
   (** [close t] closes the channel to the Gnuplot process. *)
   val close : t -> unit
 
-  (** [set ?output ?fill ?range ?titles t] sets parameters of the Gnuplot
+  (** [set ?output ?title ?fill ?range ?titles t] sets parameters of the Gnuplot
       session. *)
   val set
     :  ?output:Output.t  (* Wxt is default terminal *)
+    -> ?title:string
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
@@ -259,6 +260,7 @@ module Gp : sig
       range, etc are optional. *)
   val plot
     :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    -> ?title:string
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
@@ -271,6 +273,7 @@ module Gp : sig
       parameters for filling, range, etc are optional. *)
   val plot_many
     :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    -> ?title:string
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
@@ -284,6 +287,7 @@ module Gp : sig
       The parameters for the filling, range, etc are optional. *)
   val plot_func
     :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    -> ?title:string
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
