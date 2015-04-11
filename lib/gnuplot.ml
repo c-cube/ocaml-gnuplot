@@ -141,6 +141,7 @@ module Output_type = struct
   type t = [
   | `Wxt
   | `X11
+  | `Qt
   | `Png of string
   | `Eps of string
   ]
@@ -162,6 +163,8 @@ module Output = struct
         "set term wxt persist"^font
       | `X11 ->
         "set term x11 persist"^font
+      | `Qt ->
+        "set term qt persist"^font
       | `Png s ->
         sprintf "set term png%s\nset output '%s'" font s
       | `Eps s ->

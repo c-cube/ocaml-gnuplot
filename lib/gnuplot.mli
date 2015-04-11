@@ -64,6 +64,7 @@ module Output : sig
     :  ?font:string
     -> [ `Wxt  (* Wxt terminal device generates output in a separate window. *)
        | `X11  (* X11 terminal device for use with X servers. *)
+       | `Qt   (* Qt  terminal device generates output in a separate window. *)
        | `Png of string  (* For saving charts to a PNG file. *)
        | `Eps of string  (* For saving charts to an EPS file. *)
        ]
