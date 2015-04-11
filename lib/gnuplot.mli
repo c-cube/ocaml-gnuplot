@@ -239,6 +239,7 @@ module Gp : sig
   val set
     :  ?output:Output.t  (* Wxt is default terminal *)
     -> ?title:string
+    -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
@@ -261,6 +262,7 @@ module Gp : sig
   val plot
     :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
     -> ?title:string
+    -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
@@ -274,6 +276,7 @@ module Gp : sig
   val plot_many
     :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
     -> ?title:string
+    -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
@@ -288,6 +291,7 @@ module Gp : sig
   val plot_func
     :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
     -> ?title:string
+    -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
