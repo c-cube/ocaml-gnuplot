@@ -62,7 +62,7 @@ module Internal_format = struct
 
   let format_plot_title = format_arg (sprintf "set title \"%s\"")
 
-  let format_title = format_arg (sprintf " t '%s'")
+  let format_title = format_arg (sprintf " t \"%s\"")
 
   let format_color s = format_arg (fun (color : Color.t) ->
     let r, g, b = Color.to_rgb color in
