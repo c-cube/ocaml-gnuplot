@@ -268,6 +268,7 @@ end
 type kind =
 | Lines
 | Points
+| Linespoints
 | Steps
 | Histogram
 | Candlesticks
@@ -290,6 +291,7 @@ module Series = struct
       match kind with
       | Lines -> "lines"
       | Points -> "points"
+      | Linespoints -> "linespoints"
       | Steps -> "steps"
       | Histogram -> "histogram"
       | Candlesticks -> "candlesticks"
@@ -331,6 +333,18 @@ module Series = struct
 
   let points_func ?title ?color ?weight f =
     create ?title ?color ?weight Points (Func f)
+
+  let linespoints ?title ?color ?weight data =
+    create ?title ?color ?weight Linespoints (Data_Y data)
+
+  let linespoints_xy ?title ?color ?weight data =
+    create ?title ?color ?weight Linespoints (Data_XY data)
+
+  let linespoints_timey ?title ?color ?weight data =
+    create ?title ?color ?weight Linespoints (Data_TimeY data)
+
+  let linespoints_func ?title ?color ?weight f =
+    create ?title ?color ?weight Linespoints (Func f)
 
   let steps ?title ?color ?weight data =
     create ?title ?color ?weight Steps (Data_Y data)

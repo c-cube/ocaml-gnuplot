@@ -173,6 +173,44 @@ module Series : sig
     -> string
     -> t
 
+  (** [linespoints data] creates a data series for a lines and points plot of Y
+      values. *)
+  val linespoints
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> float list
+    -> t
+
+  (** [linespoints_xy data] creates a data series for a lines and points plot of
+      X and Y values. *)
+  val linespoints_xy
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (float * float) list
+    -> t
+
+  (** [linespoints_xy data] creates a data series for a lines and points plot of
+      time and Y values. *)
+  val linespoints_timey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Time.t * float) list
+    -> t
+
+  (** [linespoints_func f] creates a data series for a lines and points plot of
+      the values given by a function [f] specified in the Gnuplot format, eg
+      `sin(x)`.  The X values come from the range object that was supplied to
+      one of the plot functions in the [Gp] module below. *)
+  val linespoints_func
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> string
+    -> t
+
   (** [steps data] creates a data series for a step function of Y values. *)
   val steps
     :  ?title:string
