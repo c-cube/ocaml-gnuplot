@@ -2,7 +2,7 @@ open Core.Std
 open Gnuplot
 open List_utils
 
-let () = Random.init 100  (* for reproducability *)
+let () = Random.init 100  (* For reproducability. *)
 
 (* The type of a bid in an auction. *)
 type bid =
@@ -18,7 +18,6 @@ let generate_auction_data () =
     (List.range 1 100 ~stop:`inclusive |> sample ~size:100)
     (List.range 1  10 ~stop:`inclusive |> sample ~size:100)
     ~f:(fun action price volume -> { action; price; volume })
-;;
 
 (* Compute total volume sold / bought for each price level. *)
 let asks, bids =
@@ -35,7 +34,6 @@ let asks, bids =
   |> List.map ~f:aggregate
   |> List.partition_tf ~f:(fun b -> b.action = Sell)
   |> Tuple.T2.map2 ~f:List.rev
-;;
 
 let () =
   let aggregate bids =
@@ -48,5 +46,5 @@ let () =
   Gp.set gp ~title:"Supply and Demand";
   Gp.plot_many gp ~labels:(Labels.create ~x:"Volume" ~y:"Price" ())
     [ Series.steps_xy (aggregate asks) ~title:"Sell" ~color:`Green
-    ; Series.steps_xy (aggregate bids) ~title:"Buy" ~color:`Red ];
+    ; Series.steps_xy (aggregate bids) ~title:"Buy"  ~color:`Red ];
   Gp.close gp

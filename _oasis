@@ -32,34 +32,34 @@ Library gnuplot
 
 # Examples
 
-Executable ex1
+Executable "simple_plot"
   Build$:          flag(examples)
   Path:            examples
-  MainIs:          ex1.ml
+  MainIs:          simple_plot.ml
   Install:         false
   BuildDepends:    gnuplot
   CompiledObject:  best
 
-Executable ex2
+Executable "gaussian_noise"
   Build$:          flag(examples)
   Path:            examples
-  MainIs:          ex2.ml
+  MainIs:          gaussian_noise.ml
   Install:         false
   BuildDepends:    gnuplot
   CompiledObject:  best
 
-Executable ex3
+Executable "candlesticks"
   Build$:          flag(examples)
   Path:            examples
-  MainIs:          ex3.ml
+  MainIs:          candlesticks.ml
   Install:         false
   BuildDepends:    gnuplot
   CompiledObject:  best
 
-Executable ex4
+Executable "supply_demand"
   Build$:          flag(examples)
   Path:            examples
-  MainIs:          ex4.ml
+  MainIs:          supply_demand.ml
   Install:         false
   BuildDepends:    gnuplot
   CompiledObject:  best
