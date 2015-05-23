@@ -12,12 +12,14 @@ let group_by l ~f =
 ;;
 
 let scan l ~f =
-  let rec loop f y l =
+  let rec loop l s acc =
     match l with
-    | [] -> [y]
-    | x :: xs -> y :: loop f (f y x) xs
+    | [] -> List.rev acc
+    | a :: t ->
+      let s = f s a in
+      loop t s (s :: acc)
   in
   match l with
   | [] -> []
-  | x :: xs -> loop f x xs
+  | h :: t -> loop t h [h]
 ;;

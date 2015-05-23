@@ -7,6 +7,5 @@ val sample : 'a list -> size:int -> 'a list
    [f]. *)
 val group_by : 'a list -> f:('a -> 'key) -> 'a list list
 
-(* [scan l ~f] returns a list of reduced values of [l] from the left.  The
-   function is not tail-recursive). *)
+(* [scan l ~f] returns a list of reduced values of [l] from the left. *)
 val scan : 'a list -> f:('a -> 'a -> 'a) -> 'a list
