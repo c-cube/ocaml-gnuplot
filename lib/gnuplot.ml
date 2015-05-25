@@ -277,7 +277,9 @@ type data =
 | Data_Y of float list
 | Data_XY of (float * float) list
 | Data_TimeY of (Time.t * float) list
+| Data_DateY of (Date.t * float) list
 | Data_TimeOHLC of (Time.t * (float * float * float * float)) list
+| Data_DateOHLC of (Date.t * (float * float * float * float)) list
 | Func of string
 
 module Series = struct
@@ -300,8 +302,10 @@ module Series = struct
       String.concat [
         (match data with
         | Data_Y _ -> " '-' using 1 with " ^ kind_text
-        | Data_XY _ | Data_TimeY _ -> " '-' using 1:2 with " ^ kind_text
-        | Data_TimeOHLC _ -> " '-' using 1:2:3:4:5 with " ^ kind_text
+        | Data_XY _ | Data_TimeY _ | Data_DateY _ ->
+          " '-' using 1:2 with " ^ kind_text
+        | Data_TimeOHLC _ | Data_DateOHLC _ ->
+          " '-' using 1:2:3:4:5 with " ^ kind_text
         | Func f -> f ^ " with " ^ kind_text)
         ; format_title title
         ; format_num_arg "lw" weight
@@ -319,6 +323,9 @@ module Series = struct
   let lines_timey ?title ?color ?weight data =
     create ?title ?color ?weight Lines (Data_TimeY data)
 
+  let lines_datey ?title ?color ?weight data =
+    create ?title ?color ?weight Lines (Data_DateY data)
+
   let lines_func ?title ?color ?weight f =
     create ?title ?color ?weight Lines (Func f)
 
@@ -330,6 +337,9 @@ module Series = struct
 
   let points_timey ?title ?color ?weight data =
     create ?title ?color ?weight Points (Data_TimeY data)
+
+  let points_datey ?title ?color ?weight data =
+    create ?title ?color ?weight Points (Data_DateY data)
 
   let points_func ?title ?color ?weight f =
     create ?title ?color ?weight Points (Func f)
@@ -343,6 +353,9 @@ module Series = struct
   let linespoints_timey ?title ?color ?weight data =
     create ?title ?color ?weight Linespoints (Data_TimeY data)
 
+  let linespoints_datey ?title ?color ?weight data =
+    create ?title ?color ?weight Linespoints (Data_DateY data)
+
   let linespoints_func ?title ?color ?weight f =
     create ?title ?color ?weight Linespoints (Func f)
 
@@ -355,12 +368,17 @@ module Series = struct
   let steps_timey ?title ?color ?weight data =
     create ?title ?color ?weight Steps (Data_TimeY data)
 
+  let steps_datey ?title ?color ?weight data =
+    create ?title ?color ?weight Steps (Data_DateY data)
+
   let histogram ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Histogram (Data_Y data)
 
-  let candlesticks ?title ?color ?weight ?fill data =
+  let candles_time_ohlc ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Candlesticks (Data_TimeOHLC data)
 
+  let candles_date_ohlc ?title ?color ?weight ?fill data =
+    create ?title ?color ?weight ?fill Candlesticks (Data_DateOHLC data)
 end
 
 module Gp = struct
@@ -368,13 +386,15 @@ module Gp = struct
     channel : out_channel;
     verbose : bool;
     timefmt : string;
+    datefmt : string;
   }
 
   let create ?(verbose = false) ?path () =
     let path = Option.value path ~default:"gnuplot" in
     { channel = Unix.open_process_out path
     ; verbose = verbose
-    ; timefmt = "%Y-%m-%d-%H:%M:%S" }
+    ; timefmt = "%Y-%m-%d-%H:%M:%S"
+    ; datefmt = "%Y-%m-%d" }
 
   let send_cmd t cmd = output_string t.channel (cmd^"\n")
 
@@ -393,6 +413,10 @@ module Gp = struct
       List.iter data ~f:(fun (tm, y) ->
         send_cmd t (Time.format tm t.timefmt ^" "^ Float.to_string y));
       send_cmd t "e"
+    | Data_DateY data ->
+      List.iter data ~f:(fun (d, y) ->
+        send_cmd t (Date.to_string d ^" "^ Float.to_string y));
+      send_cmd t "e"
     | Data_TimeOHLC data ->
       List.iter data ~f:(fun (tm, (o, h, l, c)) ->
         send_cmd t (Time.format tm t.timefmt ^ " " ^
@@ -401,7 +425,15 @@ module Gp = struct
                     Float.to_string l ^ " " ^
                     Float.to_string c));
       send_cmd t "e"
-    | _ -> ()
+    | Data_DateOHLC data ->
+      List.iter data ~f:(fun (d, (o, h, l, c)) ->
+        send_cmd t (Date.to_string d ^ " " ^
+                    Float.to_string o ^ " " ^
+                    Float.to_string h ^ " " ^
+                    Float.to_string l ^ " " ^
+                    Float.to_string c));
+      send_cmd t "e"
+    | Func _ -> ()
 
   let internal_set ?output ?title ?(use_grid=false)
       ?fill ?range ?labels ?titles ?timefmtx t =
@@ -442,6 +474,9 @@ module Gp = struct
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ~format:t.timefmt () in
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
+    | Data_DateY _ | Data_DateOHLC _ ->
+      let timefmtx = Timefmtx.create ~format:t.datefmt () in
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
     | _ ->
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles t

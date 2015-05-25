@@ -125,6 +125,15 @@ module Series : sig
     -> (Time.t * float) list
     -> t
 
+  (** [lines_datey data] creates a data series for a line plot of date and Y
+      values. *)
+  val lines_datey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Date.t * float) list
+    -> t
+
   (** [lines_func f] creates a data series for a line plot of the values given
       by a function [f] specified in the Gnuplot format, eg `sin(x)`.  The X
       values come from the range object that was supplied to one of the
@@ -160,6 +169,15 @@ module Series : sig
     -> ?color:Color.t
     -> ?weight:int
     -> (Time.t * float) list
+    -> t
+
+  (** [points_datey data] creates a data series for a point plot of date and Y
+      values. *)
+  val points_datey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Date.t * float) list
     -> t
 
   (** [points_func f] creates a data series for a point plot of the values given
@@ -200,6 +218,15 @@ module Series : sig
     -> (Time.t * float) list
     -> t
 
+  (** [linespoints_datey data] creates a data series for a lines and points plot
+      of date and Y values. *)
+  val linespoints_datey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Date.t * float) list
+    -> t
+
   (** [linespoints_func f] creates a data series for a lines and points plot of
       the values given by a function [f] specified in the Gnuplot format, eg
       `sin(x)`.  The X values come from the range object that was supplied to
@@ -237,6 +264,15 @@ module Series : sig
     -> (Time.t * float) list
     -> t
 
+  (** [steps_datey data] creates a data series for a step function of date and Y
+      values. *)
+  val steps_datey
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (Date.t * float) list
+    -> t
+
   (** [histogram data] creates a data series for a histogram of Y values. *)
   val histogram
     :  ?title:string
@@ -246,13 +282,23 @@ module Series : sig
     -> float list
     -> t
 
-  (** [candlesticks data] creates a data series for a candlestick chart. *)
-  val candlesticks
+  (** [candles_time_ohlc data] creates a data series for a candlestick chart. *)
+  val candles_time_ohlc
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
     -> ?fill:Filling.t
     -> (Time.t * (float * float * float * float)) list
+    -> t
+
+  (** [candles_date_ohlc data] creates a data series for a candlestick chart
+      indexed by date. *)
+  val candles_date_ohlc
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> ?fill:Filling.t
+    -> (Date.t * (float * float * float * float)) list
     -> t
 end
 
