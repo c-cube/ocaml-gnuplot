@@ -153,7 +153,7 @@ module Series : sig
     -> (float * float) list
     -> t
 
-  (** [points_xy data] creates a data series for a point plot of time and Y
+  (** [points_timey data] creates a data series for a point plot of time and Y
       values. *)
   val points_timey
     :  ?title:string
@@ -191,8 +191,8 @@ module Series : sig
     -> (float * float) list
     -> t
 
-  (** [linespoints_xy data] creates a data series for a lines and points plot of
-      time and Y values. *)
+  (** [linespoints_timey data] creates a data series for a lines and points plot
+      of time and Y values. *)
   val linespoints_timey
     :  ?title:string
     -> ?color:Color.t
@@ -219,7 +219,7 @@ module Series : sig
     -> float list
     -> t
 
-  (** [steps data] creates a data series for a step function of X and Y
+  (** [steps_xy data] creates a data series for a step function of X and Y
       values. *)
   val steps_xy
     :  ?title:string
@@ -228,7 +228,7 @@ module Series : sig
     -> (float * float) list
     -> t
 
-  (** [steps data] creates a data series for a step function of time and Y
+  (** [steps_timey data] creates a data series for a step function of time and Y
       values. *)
   val steps_timey
     :  ?title:string
