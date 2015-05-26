@@ -52,6 +52,7 @@ let format_style = function
   | `Pattern n -> sprintf " fs pattern %d" n
 
 let format_num = sprintf "%f"
+let format_date = Date.to_string
 
 module Internal_format = struct
 
@@ -98,6 +99,7 @@ module Range = struct
   | X  of float * float
   | Y  of float * float
   | XY of float * float * float * float
+  | DateX of Date.t * Date.t
 
   let range ?xspec ?yspec () =
     let xspec = format_arg (sprintf "set xrange %s\n") xspec in
@@ -121,6 +123,10 @@ module Range = struct
       range
         ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
         ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
+        ()
+    | DateX (d1, d2) ->
+      range
+        ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_date d1) (format_date d2))
         ()
 end
 
@@ -413,7 +419,7 @@ module Gp = struct
       send_cmd t "e"
     | Data_DateY data ->
       List.iter data ~f:(fun (d, y) ->
-        send_cmd t (Date.to_string d ^" "^ Float.to_string y));
+        send_cmd t (format_date d ^" "^ Float.to_string y));
       send_cmd t "e"
     | Data_TimeOHLC data ->
       List.iter data ~f:(fun (tm, (o, h, l, c)) ->
@@ -425,7 +431,7 @@ module Gp = struct
       send_cmd t "e"
     | Data_DateOHLC data ->
       List.iter data ~f:(fun (d, (o, h, l, c)) ->
-        send_cmd t (Date.to_string d ^ " " ^
+        send_cmd t (format_date d ^ " " ^
                     Float.to_string o ^ " " ^
                     Float.to_string h ^ " " ^
                     Float.to_string l ^ " " ^
@@ -441,10 +447,10 @@ module Gp = struct
       ; Option.map title ~f:(fun title -> Title.(create ~title () |> to_cmd))
       ; Option.some_if use_grid Grid.to_cmd
       ; Option.map fill ~f:Filling.to_cmd
+      ; Option.map timefmtx ~f:Timefmtx.to_cmd
       ; Option.map range ~f:Range.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
       ; Option.map titles ~f:Titles.to_cmd
-      ; Option.map timefmtx ~f:Timefmtx.to_cmd
       ] |> List.filter_map ~f:Fn.id
     in
     List.iter commands ~f:(fun cmd ->

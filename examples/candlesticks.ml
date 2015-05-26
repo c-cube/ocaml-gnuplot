@@ -32,5 +32,6 @@ let () =
   let start = Date.add_days stop (-num_days) in
   let gp = Gp.create () in
   (* Plot a random candlestick chart. *)
-  Gp.plot gp (Series.candles_date_ohlc (gen_data ~start ~stop));
+  Gp.plot gp (Series.candles_date_ohlc (gen_data ~start ~stop))
+    ~range:(Range.DateX (Date.add_days start (-1), Date.add_days stop 1));
   Gp.close gp
