@@ -2,10 +2,6 @@ open Core.Std
 open Gnuplot
 
 let () =
-  let gen_dates ~num_bars =
-    let today = Date.today ~zone:Time.Zone.local in
-    List.init num_bars ~f:(fun i -> Date.add_days today (-i+1))
-  in
   (* Generate random candlestick bars. *)
   let gen_bars ~num_bars =
     let next_bar cl =
@@ -25,12 +21,16 @@ let () =
     let hi = op +. Random.float 1. /. 5. in
     let lo = op -. Random.float 1. /. 5. in
     let cl = (lo +. hi) /. 2. in
-    loop num_bars [] (op, hi, lo, cl)
+    List.rev (loop num_bars [] (op, hi, lo, cl))
   in
-  let gen_data () =
-    List.zip_exn (gen_dates ~num_bars:100) (gen_bars ~num_bars:100)
+  let gen_data ~start ~stop =
+    let date_range = Date.dates_between ~min:start ~max:stop in
+    List.zip_exn date_range (gen_bars ~num_bars:(Date.diff stop start + 1))
   in
+  let num_days = 100 in
+  let stop = Date.today ~zone:Time.Zone.local in
+  let start = Date.add_days stop (-num_days) in
   let gp = Gp.create () in
   (* Plot a random candlestick chart. *)
-  Gp.plot gp (Series.candles_date_ohlc (gen_data ()) ~title:"chart");
+  Gp.plot gp (Series.candles_date_ohlc (gen_data ~start ~stop) ~title:"chart");
   Gp.close gp
