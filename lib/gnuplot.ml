@@ -55,14 +55,12 @@ let format_num = sprintf "%f"
 
 module Internal_format = struct
 
-  let format_arg f a_opt =
-    match a_opt with
-    | None -> ""
-    | Some a -> f a
+  let format_arg ?(default = "") f a_opt =
+    Option.value_map a_opt ~default ~f:(fun a -> f a)
 
   let format_plot_title = format_arg (sprintf "set title \"%s\"")
 
-  let format_title = format_arg (sprintf " t \"%s\"")
+  let format_title = format_arg (sprintf " t \"%s\"") ~default:" notitle"
 
   let format_color s = format_arg (fun (color : Color.t) ->
     let r, g, b = Color.to_rgb color in
