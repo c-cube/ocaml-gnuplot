@@ -111,18 +111,18 @@ module Range = struct
 
   let to_cmd t =
     match t with
-    | X (fx, tx) ->
+    | X (x1, x2) ->
       range
-        ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
+        ~xspec:(sprintf "[%s:%s]" (format_num x1) (format_num x2))
         ()
-    | Y (fy, ty) ->
+    | Y (y1, y2) ->
       range
-        ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
+        ~yspec:(sprintf "[%s:%s]" (format_num y1) (format_num y2))
         ()
-    | XY (fx, tx, fy, ty) ->
+    | XY (x1, x2, y1, y2) ->
       range
-        ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
-        ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
+        ~xspec:(sprintf "[%s:%s]" (format_num x1) (format_num x2))
+        ~yspec:(sprintf "[%s:%s]" (format_num y1) (format_num y2))
         ()
     | Date (d1, d2) ->
       range
