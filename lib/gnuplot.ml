@@ -81,9 +81,6 @@ module Internal_format = struct
       |> String.concat ~sep:","
     in
     sprintf "set %s (%s)" tics titles)
-
-  let format_time_for_xaxis =
-    format_arg (sprintf "set timefmt \"%s\" \nset xdata time")
 end
 open Internal_format
 
@@ -252,20 +249,14 @@ module Titles = struct
 end
 
 module Timefmtx = struct
-  type t = {
-    format : string option;
-  }
+  type t = { format : string }
 
-  let create ?format () = { format }
+  let create format = { format }
 
   let to_cmd t =
-    let cmd =
-      [ format_time_for_xaxis t.format, "set xdata"]
-      |> List.filter ~f:(fun (s, _) -> s <> "")
-    in
     { Command.
-      command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
-      cleanup = cmd |> List.map ~f:snd |> String.concat ~sep:"\n";
+      command = "set timefmt \""^t.format^"\"\nset xdata time";
+      cleanup = "set xdata";
     }
 end
 
@@ -477,10 +468,10 @@ module Gp = struct
   let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
-      let timefmtx = Timefmtx.create ~format:t.timefmt () in
+      let timefmtx = Timefmtx.create t.timefmt in
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
     | Data_DateY _ | Data_DateOHLC _ ->
-      let timefmtx = Timefmtx.create ~format:t.datefmt () in
+      let timefmtx = Timefmtx.create t.datefmt in
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
     | _ ->
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles t
