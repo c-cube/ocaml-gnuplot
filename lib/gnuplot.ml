@@ -52,7 +52,12 @@ let format_style = function
   | `Pattern n -> sprintf " fs pattern %d" n
 
 let format_num = sprintf "%f"
-let format_date = Date.to_string
+
+let datefmt = "%Y-%m-%d"
+let timefmt = "%Y-%m-%d-%H:%M:%S"
+
+let format_date d = Date.format d datefmt
+let format_time t = Time.format t timefmt
 
 module Internal_format = struct
 
@@ -97,6 +102,7 @@ module Range = struct
   | Y  of float * float
   | XY of float * float * float * float
   | Date of Date.t * Date.t
+  | Time of Time.t * Time.t
 
   let range ?xspec ?yspec () =
     let xspec = format_arg (sprintf "set xrange %s\n") xspec in
@@ -124,6 +130,10 @@ module Range = struct
     | Date (d1, d2) ->
       range
         ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_date d1) (format_date d2))
+        ()
+    | Time (t1, t2) ->
+      range
+        ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_time t1) (format_time t2))
         ()
 end
 
@@ -380,16 +390,11 @@ module Gp = struct
   type t = {
     channel : out_channel;
     verbose : bool;
-    timefmt : string;
-    datefmt : string;
   }
 
   let create ?(verbose = false) ?path () =
     let path = Option.value path ~default:"gnuplot" in
-    { channel = Unix.open_process_out path
-    ; verbose = verbose
-    ; timefmt = "%Y-%m-%d-%H:%M:%S"
-    ; datefmt = "%Y-%m-%d" }
+    { channel = Unix.open_process_out path; verbose }
 
   let send_cmd t cmd = output_string t.channel (cmd^"\n")
 
@@ -406,7 +411,7 @@ module Gp = struct
       send_cmd t "e"
     | Data_TimeY data ->
       List.iter data ~f:(fun (tm, y) ->
-        send_cmd t (Time.format tm t.timefmt ^" "^ Float.to_string y));
+        send_cmd t (format_time tm ^" "^ Float.to_string y));
       send_cmd t "e"
     | Data_DateY data ->
       List.iter data ~f:(fun (d, y) ->
@@ -414,7 +419,7 @@ module Gp = struct
       send_cmd t "e"
     | Data_TimeOHLC data ->
       List.iter data ~f:(fun (tm, (o, h, l, c)) ->
-        send_cmd t (Time.format tm t.timefmt ^ " " ^
+        send_cmd t (format_time tm ^ " " ^
                     Float.to_string o ^ " " ^
                     Float.to_string h ^ " " ^
                     Float.to_string l ^ " " ^
@@ -468,10 +473,10 @@ module Gp = struct
   let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
-      let timefmtx = Timefmtx.create t.timefmt in
+      let timefmtx = Timefmtx.create timefmt in
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
     | Data_DateY _ | Data_DateOHLC _ ->
-      let timefmtx = Timefmtx.create t.datefmt in
+      let timefmtx = Timefmtx.create datefmt in
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
     | _ ->
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles t
