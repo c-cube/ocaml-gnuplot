@@ -99,7 +99,7 @@ module Range = struct
   | X  of float * float
   | Y  of float * float
   | XY of float * float * float * float
-  | DateX of Date.t * Date.t
+  | Date of Date.t * Date.t
 
   let range ?xspec ?yspec () =
     let xspec = format_arg (sprintf "set xrange %s\n") xspec in
@@ -124,7 +124,7 @@ module Range = struct
         ~xspec:(sprintf "[%s:%s]" (format_num fx) (format_num tx))
         ~yspec:(sprintf "[%s:%s]" (format_num fy) (format_num ty))
         ()
-    | DateX (d1, d2) ->
+    | Date (d1, d2) ->
       range
         ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_date d1) (format_date d2))
         ()

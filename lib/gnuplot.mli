@@ -44,7 +44,7 @@ module Range : sig
   | X  of float * float
   | Y  of float * float
   | XY of float * float * float * float
-  | DateX of Date.t * Date.t
+  | Date of Date.t * Date.t
 end
 
 module Filling : sig
