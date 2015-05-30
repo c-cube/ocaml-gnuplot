@@ -447,7 +447,7 @@ module Gp = struct
       ; Option.map range ~f:Range.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
       ; Option.map titles ~f:Titles.to_cmd
-      ] |> List.filter_map ~f:Fn.id
+      ] |> List.filter_opt
     in
     List.iter commands ~f:(fun cmd ->
       if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
@@ -461,7 +461,7 @@ module Gp = struct
       [ Option.map fill ~f:Filling.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
       ; Option.map titles ~f:Titles.to_cmd
-      ] |> List.filter_map ~f:Fn.id
+      ] |> List.filter_opt
     in
     List.iter commands ~f:(fun cmd ->
       if cmd.Command.cleanup <> "" then begin
