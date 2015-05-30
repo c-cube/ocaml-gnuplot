@@ -350,6 +350,7 @@ module Gp : sig
     -> ?range:Range.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
+    -> ?format:string
     -> t
     -> Series.t
     -> unit
@@ -364,6 +365,7 @@ module Gp : sig
     -> ?range:Range.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
+    -> ?format:string
     -> t
     -> Series.t list
     -> unit

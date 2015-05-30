@@ -259,13 +259,19 @@ module Titles = struct
 end
 
 module Timefmtx = struct
-  type t = { format : string }
+  type t = {
+    timefmt : string;
+    format  : string option;
+  }
 
-  let create format = { format }
+  let create ?format timefmt = { timefmt; format; }
 
   let to_cmd t =
     { Command.
-      command = "set timefmt \""^t.format^"\"\nset xdata time";
+      command =
+        [ Some ("set timefmt \""^t.timefmt^"\"\nset xdata time")
+        ; Option.map t.format ~f:(fun fmt -> "\nset format x \""^fmt^"\"\n")
+        ] |> List.filter_opt |> String.concat;
       cleanup = "set xdata";
     }
 end
@@ -469,13 +475,13 @@ module Gp = struct
         send_cmd t cmd.Command.cleanup
       end)
 
-  let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles t data =
+  let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles ?format t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
-      let timefmtx = Timefmtx.create timefmt in
+      let timefmtx = Timefmtx.create ?format timefmt in
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
     | Data_DateY _ | Data_DateOHLC _ ->
-      let timefmtx = Timefmtx.create datefmt in
+      let timefmtx = Timefmtx.create ?format datefmt in
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
     | _ ->
       internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles t
@@ -490,8 +496,8 @@ module Gp = struct
     unset ?fill ?labels ?titles t;
     flush t.channel
 
-  let plot ?output ?title ?use_grid ?fill ?range ?labels ?titles t data =
-    plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles t [data]
+  let plot ?output ?title ?use_grid ?fill ?range ?labels ?titles ?format t data =
+    plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles ?format t [data]
 
   let plot_func ?output ?title ?use_grid ?fill ?range ?labels ?titles t func =
     plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles t
