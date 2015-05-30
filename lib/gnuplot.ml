@@ -453,13 +453,12 @@ module Gp = struct
       if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
 
-  let set ?output ?title ?use_grid ?fill ?range ?labels ?titles t =
-    internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles t
+  let set ?output ?title ?use_grid ?fill ?labels ?titles t =
+    internal_set ?output ?title ?use_grid ?fill ?labels ?titles t
 
-  let unset ?fill ?range ?labels ?titles t =
+  let unset ?fill ?labels ?titles t =
     let commands =
       [ Option.map fill ~f:Filling.to_cmd
-      ; Option.map range ~f:Range.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
       ; Option.map titles ~f:Titles.to_cmd
       ] |> List.filter_map ~f:Fn.id
@@ -488,7 +487,7 @@ module Gp = struct
     if t.verbose then printf "Command: %s\n%!" cmd;
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
-    unset ?fill ?range ?labels ?titles t;
+    unset ?fill ?labels ?titles t;
     flush t.channel
 
   let plot ?output ?title ?use_grid ?fill ?range ?labels ?titles t data =

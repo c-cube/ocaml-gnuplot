@@ -320,24 +320,21 @@ module Gp : sig
   (** [close t] closes the channel to the Gnuplot process. *)
   val close : t -> unit
 
-  (** [set ?output ?title ?fill ?range ?titles t] sets parameters of the Gnuplot
+  (** [set ?output ?title ?fill ?titles t] sets parameters of the Gnuplot
       session. *)
   val set
     :  ?output:Output.t  (* Wxt is default terminal *)
     -> ?title:string
     -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
-    -> ?range:Range.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
     -> unit
 
-  (** [unset ?fill ?range ?titles t] resets parameters of the Gnuplot
-      session. *)
+  (** [unset ?fill ?titles t] resets parameters of the Gnuplot session. *)
   val unset
     :  ?fill:Filling.t
-    -> ?range:Range.t
     -> ?labels:Labels.t
     -> ?titles:Titles.t
     -> t
