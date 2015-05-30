@@ -58,6 +58,7 @@ let timefmt = "%Y-%m-%d-%H:%M:%S"
 
 let format_date d = Date.format d datefmt
 let format_time t = Time.format t timefmt
+let format_num = Float.to_string
 
 module Internal_format = struct
 
@@ -409,35 +410,35 @@ module Gp = struct
   let send_data t data =
     match data with
     | Data_Y data ->
-      List.iter data ~f:(fun y -> send_cmd t (Float.to_string y));
+      List.iter data ~f:(fun y -> send_cmd t (format_num y));
       send_cmd t "e"
     | Data_XY data ->
       List.iter data ~f:(fun (x, y) ->
-        send_cmd t (Float.to_string x ^" "^ Float.to_string y));
+        send_cmd t (format_num x ^" "^ format_num y));
       send_cmd t "e"
     | Data_TimeY data ->
       List.iter data ~f:(fun (tm, y) ->
-        send_cmd t (format_time tm ^" "^ Float.to_string y));
+        send_cmd t (format_time tm ^" "^ format_num y));
       send_cmd t "e"
     | Data_DateY data ->
       List.iter data ~f:(fun (d, y) ->
-        send_cmd t (format_date d ^" "^ Float.to_string y));
+        send_cmd t (format_date d ^" "^ format_num y));
       send_cmd t "e"
     | Data_TimeOHLC data ->
       List.iter data ~f:(fun (tm, (o, h, l, c)) ->
-        send_cmd t (format_time tm ^ " " ^
-                    Float.to_string o ^ " " ^
-                    Float.to_string h ^ " " ^
-                    Float.to_string l ^ " " ^
-                    Float.to_string c));
+        send_cmd t (format_time tm ^" "^
+                    format_num   o ^" "^
+                    format_num   h ^" "^
+                    format_num   l ^" "^
+                    format_num   c));
       send_cmd t "e"
     | Data_DateOHLC data ->
       List.iter data ~f:(fun (d, (o, h, l, c)) ->
-        send_cmd t (format_date d ^ " " ^
-                    Float.to_string o ^ " " ^
-                    Float.to_string h ^ " " ^
-                    Float.to_string l ^ " " ^
-                    Float.to_string c));
+        send_cmd t (format_date d ^" "^
+                    format_num  o ^" "^
+                    format_num  h ^" "^
+                    format_num  l ^" "^
+                    format_num  c));
       send_cmd t "e"
     | Func _ -> ()
 
