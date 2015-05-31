@@ -370,7 +370,7 @@ module Gp : sig
     -> Series.t list
     -> unit
 
-  (** [plot_many t f] draws a graph of the function [f] given as a string.
+  (** [plot_func t f] draws a graph of the function [f] given as a string.
       The function [f] has to be specified in the Gnuplot format, eg `sin(x)`.
       The parameters for the filling, range, etc are optional. *)
   val plot_func
