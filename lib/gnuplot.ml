@@ -106,8 +106,8 @@ module Range = struct
   | Time of Time.t * Time.t
 
   let range ?xspec ?yspec () =
-    let xspec = format_arg (sprintf "set xrange %s\n") xspec in
-    let yspec = format_arg (sprintf "set yrange %s\n") yspec in
+    let xspec = format_arg (sprintf "set xrange %s") xspec in
+    let yspec = format_arg (sprintf "set yrange %s") yspec in
     { Command.
       command = xspec ^ yspec;
       cleanup = "set autoscale xy";
@@ -271,7 +271,7 @@ module Timefmtx = struct
     { Command.
       command =
         [ Some ("set timefmt \""^t.timefmt^"\"\nset xdata time")
-        ; Option.map t.format ~f:(fun fmt -> "\nset format x \""^fmt^"\"\n")
+        ; Option.map t.format ~f:(fun fmt -> "\nset format x \""^fmt^"\"")
         ] |> List.filter_opt |> String.concat;
       cleanup = "set xdata";
     }
