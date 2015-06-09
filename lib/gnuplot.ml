@@ -106,10 +106,14 @@ module Range = struct
   | Time of Time.t * Time.t
 
   let range ?xspec ?yspec () =
+    let sep = match xspec, yspec with
+      | Some _, Some _ -> "\n"
+      | _, _ -> ""
+    in
     let xspec = format_arg (sprintf "set xrange %s") xspec in
     let yspec = format_arg (sprintf "set yrange %s") yspec in
     { Command.
-      command = xspec ^ yspec;
+      command = String.concat [xspec; yspec] ~sep;
       cleanup = "set autoscale xy";
     }
 
