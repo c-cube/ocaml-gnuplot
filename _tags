@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 9045bc53dcdf87af330bcd431a256d45)
+# DO NOT EDIT (digest: 75422436ae027aa23e4e695f664dd22c)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -26,6 +26,10 @@ true: annot, bin_annot
 <examples/gaussian_noise.{native,byte}>: pkg_core
 <examples/gaussian_noise.{native,byte}>: pkg_threads
 <examples/gaussian_noise.{native,byte}>: use_gnuplot
+# Executable gbm_paths
+<examples/gbm_paths.{native,byte}>: pkg_core
+<examples/gbm_paths.{native,byte}>: pkg_threads
+<examples/gbm_paths.{native,byte}>: use_gnuplot
 # Executable candlesticks
 <examples/candlesticks.{native,byte}>: pkg_core
 <examples/candlesticks.{native,byte}>: pkg_threads

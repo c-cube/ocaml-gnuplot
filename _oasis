@@ -48,6 +48,14 @@ Executable "gaussian_noise"
   BuildDepends:    gnuplot
   CompiledObject:  best
 
+Executable "gbm_paths"
+  Build$:          flag(examples)
+  Path:            examples
+  MainIs:          gbm_paths.ml
+  Install:         false
+  BuildDepends:    gnuplot
+  CompiledObject:  best
+
 Executable "candlesticks"
   Build$:          flag(examples)
   Path:            examples
