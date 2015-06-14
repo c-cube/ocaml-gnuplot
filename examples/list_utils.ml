@@ -11,7 +11,7 @@ let group_by l ~f =
   |> List.group ~break:(fun x1 x2 -> f x1 <> f x2)
 ;;
 
-let scan l ~f =
+let scan l ~init ~f =
   let rec loop l s acc =
     match l with
     | [] -> List.rev acc
@@ -19,7 +19,4 @@ let scan l ~f =
       let s = f s a in
       loop t s (s :: acc)
   in
-  match l with
-  | [] -> []
-  | h :: t -> loop t h [h]
-;;
+  loop l init [init]

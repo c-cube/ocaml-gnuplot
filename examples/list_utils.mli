@@ -7,5 +7,6 @@ val sample : 'a list -> size:int -> 'a list
    [f]. *)
 val group_by : 'a list -> f:('a -> 'key) -> 'a list list
 
-(* [scan l ~f] returns a list of reduced values of [l] from the left. *)
-val scan : 'a list -> f:('a -> 'a -> 'a) -> 'a list
+(* [scan l ~init ~f] returns a list of reduced values of [l] from the left
+   starting with [init]. *)
+val scan : 'a list -> init:'b -> f:('b -> 'a -> 'b) -> 'b list

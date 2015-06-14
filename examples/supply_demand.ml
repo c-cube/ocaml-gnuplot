@@ -36,10 +36,13 @@ let asks, bids =
   |> Tuple.T2.map2 ~f:List.rev
 
 let () =
-  let aggregate bids =
-    scan bids ~f:(fun b1 b2 ->
-      { b1 with price = b2.price; volume = b1.volume + b2.volume }
-    ) |> List.map ~f:(fun q -> float q.volume, float q.price)
+  let aggregate quotes =
+    begin match quotes with
+    | [] | [_] as x -> x
+    | quote :: quotes ->
+      scan quotes ~init:quote ~f:(fun q1 q2 ->
+        { q1 with price = q2.price; volume = q1.volume + q2.volume })
+    end |> List.map ~f:(fun q -> float q.volume, float q.price)
   in
   let gp = Gp.create () in
   (* Plot supply and demand curve. *)
