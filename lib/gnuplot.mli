@@ -68,6 +68,7 @@ module Output : sig
        | `X11  (* X11 terminal device for use with X servers. *)
        | `Qt   (* Qt  terminal device generates output in a separate window. *)
        | `Png of string  (* For saving charts to a PNG file. *)
+       | `Png_cairo of string  (* Same as [`Png], but uses Cairo libs for rendering. *)
        | `Eps of string  (* For saving charts to an EPS file. *)
        ]
     -> t

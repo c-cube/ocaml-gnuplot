@@ -160,7 +160,7 @@ module Output_type = struct
   | `Wxt
   | `X11
   | `Qt
-  | `Png of string
+  | `Png of string | `Png_cairo of string
   | `Eps of string
   ]
 end
@@ -185,6 +185,8 @@ module Output = struct
         "set term qt persist"^font
       | `Png s ->
         sprintf "set term png%s\nset output '%s'" font s
+      | `Png_cairo s ->
+        sprintf "set term pngcairo%s\nset output '%s'" font s
       | `Eps s ->
         sprintf "set term postscript eps enhanced%s\nset output '%s'" font s
     in
