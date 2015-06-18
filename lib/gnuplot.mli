@@ -85,19 +85,6 @@ module Labels : sig
     -> t
 end
 
-module Titles : sig
-  (** Specifies titles for the X and Y axes. *)
-  type t
-
-  val create
-    :  ?x:string list
-    -> ?xrotate:int
-    -> ?y:string list
-    -> ?yrotate:int
-    -> unit
-    -> t
-end
-
 module Series : sig
   (** Represents a series of data for the plot functions in the [Gp] module. *)
   type t
@@ -321,7 +308,7 @@ module Gp : sig
   (** [close t] closes the channel to the Gnuplot process. *)
   val close : t -> unit
 
-  (** [set ?output ?title ?fill ?titles t] sets parameters of the Gnuplot
+  (** [set ?output ?title ?fill t] sets parameters of the Gnuplot
       session. *)
   val set
     :  ?output:Output.t  (* Wxt is default terminal *)
@@ -329,15 +316,13 @@ module Gp : sig
     -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
     -> ?labels:Labels.t
-    -> ?titles:Titles.t
     -> t
     -> unit
 
-  (** [unset ?fill ?titles t] resets parameters of the Gnuplot session. *)
+  (** [unset ?fill ?labels t] resets parameters of the Gnuplot session. *)
   val unset
     :  ?fill:Filling.t
     -> ?labels:Labels.t
-    -> ?titles:Titles.t
     -> t
     -> unit
 
@@ -350,7 +335,6 @@ module Gp : sig
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
-    -> ?titles:Titles.t
     -> ?format:string
     -> t
     -> Series.t
@@ -365,7 +349,6 @@ module Gp : sig
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
-    -> ?titles:Titles.t
     -> ?format:string
     -> t
     -> Series.t list
@@ -381,7 +364,6 @@ module Gp : sig
     -> ?fill:Filling.t
     -> ?range:Range.t
     -> ?labels:Labels.t
-    -> ?titles:Titles.t
     -> t
     -> string
     -> unit

@@ -77,16 +77,7 @@ module Internal_format = struct
 
   let format_fill = format_arg format_style
 
-  let format_rotate s = format_arg (sprintf "set %s rotate by %d" s)
-
   let format_label label = format_arg (fun s -> sprintf "set %s \"%s\"" label s)
-
-  let format_titles tics = format_arg (fun list ->
-    let titles =
-      List.mapi list ~f:(fun n t -> sprintf "\"%s\" %d" t n)
-      |> String.concat ~sep:","
-    in
-    sprintf "set %s (%s)" tics titles)
 end
 open Internal_format
 
@@ -232,31 +223,6 @@ module Labels = struct
     let cmd =
       [ format_label "xlabel" t.x, "set xlabel"
       ; format_label "ylabel" t.y, "set ylabel"
-      ] |> List.filter ~f:(fun (s, _) -> s <> "")
-    in
-    { Command.
-      command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
-      cleanup = cmd |> List.map ~f:snd |> String.concat ~sep:"\n";
-    }
-end
-
-module Titles = struct
-  type t = {
-    x : string list option;
-    y : string list option;
-    xrotate : int option;
-    yrotate : int option;
-  }
-
-  let create ?x ?xrotate ?y ?yrotate () =
-    { x; y; xrotate; yrotate; }
-
-  let to_cmd t =
-    let cmd =
-      [ format_rotate "xtic" t.xrotate, "set xtic rotate by 0"
-      ; format_rotate "ytic" t.yrotate, "set ytic rotate by 0"
-      ; format_titles "xtics" t.x, "set xtics auto"
-      ; format_titles "ytics" t.y, "set ytics auto"
       ] |> List.filter ~f:(fun (s, _) -> s <> "")
     in
     { Command.
@@ -449,7 +415,7 @@ module Gp = struct
     | Func _ -> ()
 
   let internal_set ?output ?title ?(use_grid=false)
-      ?fill ?range ?labels ?titles ?timefmtx t =
+      ?fill ?range ?labels ?timefmtx t =
     let commands =
       [ Option.value_map output ~f:Output.to_cmd
           ~default:Output.default_cmd |> Option.some
@@ -459,21 +425,19 @@ module Gp = struct
       ; Option.map timefmtx ~f:Timefmtx.to_cmd
       ; Option.map range ~f:Range.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
-      ; Option.map titles ~f:Titles.to_cmd
       ] |> List.filter_opt
     in
     List.iter commands ~f:(fun cmd ->
       if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
       send_cmd t cmd.Command.command)
 
-  let set ?output ?title ?use_grid ?fill ?labels ?titles t =
-    internal_set ?output ?title ?use_grid ?fill ?labels ?titles t
+  let set ?output ?title ?use_grid ?fill ?labels t =
+    internal_set ?output ?title ?use_grid ?fill ?labels t
 
-  let unset ?fill ?labels ?titles t =
+  let unset ?fill ?labels t =
     let commands =
       [ Option.map fill ~f:Filling.to_cmd
       ; Option.map labels ~f:Labels.to_cmd
-      ; Option.map titles ~f:Titles.to_cmd
       ] |> List.filter_opt
     in
     List.iter commands ~f:(fun cmd ->
@@ -482,16 +446,16 @@ module Gp = struct
         send_cmd t cmd.Command.cleanup
       end)
 
-  let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles ?format t data =
+  let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
     begin match (List.hd_exn data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ?format timefmt in
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
     | Data_DateY _ | Data_DateOHLC _ ->
       let timefmtx = Timefmtx.create ?format datefmt in
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles ~timefmtx t
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
     | _ ->
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels ?titles t
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels t
     end;
     let cmd =
       "plot \\\n" ^
@@ -500,13 +464,13 @@ module Gp = struct
     if t.verbose then printf "Command: %s\n%!" cmd;
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
-    unset ?fill ?labels ?titles t;
+    unset ?fill ?labels t;
     flush t.channel
 
-  let plot ?output ?title ?use_grid ?fill ?range ?labels ?titles ?format t data =
-    plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles ?format t [data]
+  let plot ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
+    plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format t [data]
 
-  let plot_func ?output ?title ?use_grid ?fill ?range ?labels ?titles t func =
-    plot_many ?output ?title ?use_grid ?fill ?range ?labels ?titles t
+  let plot_func ?output ?title ?use_grid ?fill ?range ?labels t func =
+    plot_many ?output ?title ?use_grid ?fill ?range ?labels t
       [Series.lines_func func]
 end
