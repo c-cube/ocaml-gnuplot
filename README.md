@@ -41,11 +41,20 @@ generates the following plot:
 
 ![Simple Plot](http://ogu.bitbucket.org/simple_plot.png)
 
-For more complex examples please refer to the `examples`-directory of this
+For more examples please refer to the `examples`-directory of this
 distribution.  You can build the examples by typing
 
     $ ./configure --enable-examples
     $ make
+
+For instance,
+
+    $ ./gbm_paths.native
+
+shows 10 simulated paths of geometric Brownian motion:
+
+![GBM Paths](http://ogu.bitbucket.org/gbm_paths.png)
+
 
 Contact Information
 -------------------
