@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 8762c652eb71b7d40c8cb5b903d364b2) *)
+(* DO NOT EDIT (digest: d61289503f87977e946d36bada3b3336) *)
 
 This is the INSTALL file for the gnuplot distribution.
 
@@ -11,7 +11,7 @@ Dependencies
 
 In order to compile this package, you will need:
 
-* ocaml (>= 3.12) for all, doc API
+* ocaml (>= 4.00) for all, doc API
 * findlib (>= 1.3.1)
 * core for library gnuplot
 
