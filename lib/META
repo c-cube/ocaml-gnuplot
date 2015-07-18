@@ -1,6 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: c1a6038abed25721eed6b5b9f5d30cd9)
-version = "0.1"
+# DO NOT EDIT (digest: 1b5ef1e1394f289607689e576fd1879a)
+version = "0.5"
 description = "Simple interface to Gnuplot"
 requires = "core threads"
 archive(byte) = "gnuplot.cma"

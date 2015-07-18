@@ -1,9 +1,10 @@
 OASISFormat:       0.4
 Name:              gnuplot
-Version:           0.1
+Version:           0.5
 Synopsis:          Simple interface to Gnuplot
-Description:       Gnuplot-OCaml is an OCaml clone of FSharp.GnuPlot
-                   from Tomas Petricek.
+Description:       Gnuplot-OCaml provides a simple interface to Gnuplot
+                   from OCaml. The API supports only 2D graphs and was
+                   inspired by FnuPlot.
 Authors:           Oliver Gu <gu.oliver@yahoo.com>
 Maintainers:       Oliver Gu <gu.oliver@yahoo.com>
 License:           LGPL-2.1+ with OCaml linking exception
@@ -13,7 +14,6 @@ Homepage:          https://bitbucket.org/ogu/gnuplot-ocaml
 Plugins:           META (0.4), StdFiles (0.4), DevFiles (0.4)
 XStdFilesREADME:   false
 BuildTools:        ocamlbuild, ocamldoc
-PostDistcleanCommand: $rm test1.png
 
 # Flags
 

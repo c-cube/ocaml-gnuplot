@@ -10,6 +10,10 @@ inspired by [FnuPlot](https://github.com/fsprojects/FnuPlot).
 Installation
 ------------
 
+From [OPAM](http://opam.ocaml.org)
+
+    $ opam install gnuplot
+
 From Source
 
     $ make
