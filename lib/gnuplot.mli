@@ -45,7 +45,7 @@ module Range : sig
   | Y  of float * float
   | XY of float * float * float * float
   | Date of Date.t * Date.t
-  | Time of Time.t * Time.t
+  | Time of Time.t * Time.t * Time.Zone.t
 end
 
 module Filling : sig
@@ -106,12 +106,13 @@ module Series : sig
     -> (float * float) list
     -> t
 
-  (** [lines_xy data] creates a data series for a line plot of time and Y
-      values. *)
+  (** [lines_timey ~zone data] creates a data series for a line plot with time
+      axis in the given time [zone]. *)
   val lines_timey
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
+    -> zone:Time.Zone.t
     -> (Time.t * float) list
     -> t
 
@@ -152,12 +153,13 @@ module Series : sig
     -> (float * float) list
     -> t
 
-  (** [points_timey data] creates a data series for a point plot of time and Y
-      values. *)
+  (** [points_timey ~zone data] creates a data series for a point plot with time
+      axis in the given time [zone]. *)
   val points_timey
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
+    -> zone:Time.Zone.t
     -> (Time.t * float) list
     -> t
 
@@ -199,12 +201,13 @@ module Series : sig
     -> (float * float) list
     -> t
 
-  (** [linespoints_timey data] creates a data series for a lines and points plot
-      of time and Y values. *)
+  (** [linespoints_timey ~zone data] creates a data series for a lines and
+      points plot with time axis in the given time [zone]. *)
   val linespoints_timey
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
+    -> zone:Time.Zone.t
     -> (Time.t * float) list
     -> t
 
@@ -245,12 +248,13 @@ module Series : sig
     -> (float * float) list
     -> t
 
-  (** [steps_timey data] creates a data series for a step function of time and Y
-      values. *)
+  (** [steps_timey ~zone data] creates a data series for a step function with
+      time axis in the given time [zone]. *)
   val steps_timey
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
+    -> zone:Time.Zone.t
     -> (Time.t * float) list
     -> t
 
@@ -272,12 +276,14 @@ module Series : sig
     -> float list
     -> t
 
-  (** [candles_time_ohlc data] creates a data series for a candlestick chart. *)
+  (** [candles_time_ohlc ~zone data] creates a data series for a candlestick
+      chart with time axis in the given time [zone]. *)
   val candles_time_ohlc
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
     -> ?fill:Filling.t
+    -> zone:Time.Zone.t
     -> (Time.t * (float * float * float * float)) list
     -> t
 

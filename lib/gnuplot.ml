@@ -57,7 +57,7 @@ let datefmt = "%Y-%m-%d"
 let timefmt = "%Y-%m-%d-%H:%M:%S"
 
 let format_date d = Date.format d datefmt
-let format_time t = Time.format t timefmt
+let format_time t ~zone = Time.format t timefmt ~zone
 let format_num = Float.to_string
 
 module Internal_format = struct
@@ -94,7 +94,7 @@ module Range = struct
   | Y  of float * float
   | XY of float * float * float * float
   | Date of Date.t * Date.t
-  | Time of Time.t * Time.t
+  | Time of Time.t * Time.t * Time.Zone.t
 
   let range ?xspec ?yspec () =
     let sep = match xspec, yspec with
@@ -127,9 +127,9 @@ module Range = struct
       range
         ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_date d1) (format_date d2))
         ()
-    | Time (t1, t2) ->
+    | Time (t1, t2, zone) ->
       range
-        ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_time t1) (format_time t2))
+        ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_time t1 ~zone) (format_time t2 ~zone))
         ()
 end
 
@@ -260,9 +260,9 @@ type kind =
 type data =
 | Data_Y of float list
 | Data_XY of (float * float) list
-| Data_TimeY of (Time.t * float) list
+| Data_TimeY of (Time.t * float) list * Time.Zone.t
 | Data_DateY of (Date.t * float) list
-| Data_TimeOHLC of (Time.t * (float * float * float * float)) list
+| Data_TimeOHLC of (Time.t * (float * float * float * float)) list * Time.Zone.t
 | Data_DateOHLC of (Date.t * (float * float * float * float)) list
 | Func of string
 
@@ -304,8 +304,8 @@ module Series = struct
   let lines_xy ?title ?color ?weight data =
     create ?title ?color ?weight Lines (Data_XY data)
 
-  let lines_timey ?title ?color ?weight data =
-    create ?title ?color ?weight Lines (Data_TimeY data)
+  let lines_timey ?title ?color ?weight ~zone data =
+    create ?title ?color ?weight Lines (Data_TimeY (data, zone))
 
   let lines_datey ?title ?color ?weight data =
     create ?title ?color ?weight Lines (Data_DateY data)
@@ -319,8 +319,8 @@ module Series = struct
   let points_xy ?title ?color ?weight data =
     create ?title ?color ?weight Points (Data_XY data)
 
-  let points_timey ?title ?color ?weight data =
-    create ?title ?color ?weight Points (Data_TimeY data)
+  let points_timey ?title ?color ?weight ~zone data =
+    create ?title ?color ?weight Points (Data_TimeY (data, zone))
 
   let points_datey ?title ?color ?weight data =
     create ?title ?color ?weight Points (Data_DateY data)
@@ -334,8 +334,8 @@ module Series = struct
   let linespoints_xy ?title ?color ?weight data =
     create ?title ?color ?weight Linespoints (Data_XY data)
 
-  let linespoints_timey ?title ?color ?weight data =
-    create ?title ?color ?weight Linespoints (Data_TimeY data)
+  let linespoints_timey ?title ?color ?weight ~zone data =
+    create ?title ?color ?weight Linespoints (Data_TimeY (data, zone))
 
   let linespoints_datey ?title ?color ?weight data =
     create ?title ?color ?weight Linespoints (Data_DateY data)
@@ -349,8 +349,8 @@ module Series = struct
   let steps_xy ?title ?color ?weight data =
     create ?title ?color ?weight Steps (Data_XY data)
 
-  let steps_timey ?title ?color ?weight data =
-    create ?title ?color ?weight Steps (Data_TimeY data)
+  let steps_timey ?title ?color ?weight ~zone data =
+    create ?title ?color ?weight Steps (Data_TimeY (data, zone))
 
   let steps_datey ?title ?color ?weight data =
     create ?title ?color ?weight Steps (Data_DateY data)
@@ -358,8 +358,8 @@ module Series = struct
   let histogram ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Histogram (Data_Y data)
 
-  let candles_time_ohlc ?title ?color ?weight ?fill data =
-    create ?title ?color ?weight ?fill Candlesticks (Data_TimeOHLC data)
+  let candles_time_ohlc ?title ?color ?weight ?fill ~zone data =
+    create ?title ?color ?weight ?fill Candlesticks (Data_TimeOHLC (data, zone))
 
   let candles_date_ohlc ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Candlesticks (Data_DateOHLC data)
@@ -388,21 +388,21 @@ module Gp = struct
       List.iter data ~f:(fun (x, y) ->
         send_cmd t (format_num x ^" "^ format_num y));
       send_cmd t "e"
-    | Data_TimeY data ->
+    | Data_TimeY (data, zone) ->
       List.iter data ~f:(fun (tm, y) ->
-        send_cmd t (format_time tm ^" "^ format_num y));
+        send_cmd t (format_time tm ~zone ^" "^ format_num y));
       send_cmd t "e"
     | Data_DateY data ->
       List.iter data ~f:(fun (d, y) ->
         send_cmd t (format_date d ^" "^ format_num y));
       send_cmd t "e"
-    | Data_TimeOHLC data ->
+    | Data_TimeOHLC (data, zone) ->
       List.iter data ~f:(fun (tm, (o, h, l, c)) ->
-        send_cmd t (format_time tm ^" "^
-                    format_num   o ^" "^
-                    format_num   h ^" "^
-                    format_num   l ^" "^
-                    format_num   c));
+        send_cmd t (format_time tm ~zone ^" "^
+                    format_num         o ^" "^
+                    format_num         h ^" "^
+                    format_num         l ^" "^
+                    format_num         c));
       send_cmd t "e"
     | Data_DateOHLC data ->
       List.iter data ~f:(fun (d, (o, h, l, c)) ->
@@ -471,6 +471,5 @@ module Gp = struct
     plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format t [data]
 
   let plot_func ?output ?title ?use_grid ?fill ?range ?labels t func =
-    plot_many ?output ?title ?use_grid ?fill ?range ?labels t
-      [Series.lines_func func]
+    plot_many ?output ?title ?use_grid ?fill ?range ?labels t [Series.lines_func func]
 end
