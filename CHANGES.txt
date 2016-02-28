@@ -1,1 +1,3 @@
+2016-02-28: Require time zone argument for plots with a time axis.
+
 2015-07-18: Initial public release.
