@@ -112,7 +112,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
+    -> ?zone:Time.Zone.t  (* Defaults to local time zone. *)
     -> (Time.t * float) list
     -> t
 
@@ -159,7 +159,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
+    -> ?zone:Time.Zone.t  (* Defaults to local time zone. *)
     -> (Time.t * float) list
     -> t
 
@@ -207,7 +207,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
+    -> ?zone:Time.Zone.t  (* Defaults to local time zone. *)
     -> (Time.t * float) list
     -> t
 
@@ -254,7 +254,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
+    -> ?zone:Time.Zone.t  (* Defaults to local time zone. *)
     -> (Time.t * float) list
     -> t
 
@@ -283,7 +283,7 @@ module Series : sig
     -> ?color:Color.t
     -> ?weight:int
     -> ?fill:Filling.t
-    -> zone:Time.Zone.t
+    -> ?zone:Time.Zone.t  (* Defaults to local time zone. *)
     -> (Time.t * (float * float * float * float)) list
     -> t
 

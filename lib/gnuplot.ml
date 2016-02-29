@@ -57,7 +57,7 @@ let datefmt = "%Y-%m-%d"
 let timefmt = "%Y-%m-%d-%H:%M:%S"
 
 let format_date d = Date.format d datefmt
-let format_time t ~zone = Time.format t timefmt ~zone
+let format_time ?(zone=Time.Zone.local) t = Time.format t timefmt ~zone
 let format_num = Float.to_string
 
 module Internal_format = struct
@@ -304,7 +304,7 @@ module Series = struct
   let lines_xy ?title ?color ?weight data =
     create ?title ?color ?weight Lines (Data_XY data)
 
-  let lines_timey ?title ?color ?weight ~zone data =
+  let lines_timey ?title ?color ?weight ?(zone=Time.Zone.local) data =
     create ?title ?color ?weight Lines (Data_TimeY (data, zone))
 
   let lines_datey ?title ?color ?weight data =
@@ -319,7 +319,7 @@ module Series = struct
   let points_xy ?title ?color ?weight data =
     create ?title ?color ?weight Points (Data_XY data)
 
-  let points_timey ?title ?color ?weight ~zone data =
+  let points_timey ?title ?color ?weight ?(zone=Time.Zone.local) data =
     create ?title ?color ?weight Points (Data_TimeY (data, zone))
 
   let points_datey ?title ?color ?weight data =
@@ -334,7 +334,7 @@ module Series = struct
   let linespoints_xy ?title ?color ?weight data =
     create ?title ?color ?weight Linespoints (Data_XY data)
 
-  let linespoints_timey ?title ?color ?weight ~zone data =
+  let linespoints_timey ?title ?color ?weight ?(zone=Time.Zone.local) data =
     create ?title ?color ?weight Linespoints (Data_TimeY (data, zone))
 
   let linespoints_datey ?title ?color ?weight data =
@@ -349,7 +349,7 @@ module Series = struct
   let steps_xy ?title ?color ?weight data =
     create ?title ?color ?weight Steps (Data_XY data)
 
-  let steps_timey ?title ?color ?weight ~zone data =
+  let steps_timey ?title ?color ?weight ?(zone=Time.Zone.local) data =
     create ?title ?color ?weight Steps (Data_TimeY (data, zone))
 
   let steps_datey ?title ?color ?weight data =
@@ -358,7 +358,7 @@ module Series = struct
   let histogram ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Histogram (Data_Y data)
 
-  let candles_time_ohlc ?title ?color ?weight ?fill ~zone data =
+  let candles_time_ohlc ?title ?color ?weight ?fill ?(zone=Time.Zone.local) data =
     create ?title ?color ?weight ?fill Candlesticks (Data_TimeOHLC (data, zone))
 
   let candles_date_ohlc ?title ?color ?weight ?fill data =
