@@ -95,6 +95,7 @@ module Range = struct
   | XY of float * float * float * float
   | Date of Date.t * Date.t
   | Time of Time.t * Time.t * Time.Zone.t
+  | Local_time of Time.t * Time.t
 
   let range ?xspec ?yspec () =
     let sep = match xspec, yspec with
@@ -130,6 +131,10 @@ module Range = struct
     | Time (t1, t2, zone) ->
       range
         ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_time t1 ~zone) (format_time t2 ~zone))
+        ()
+    | Local_time (t1, t2) ->
+      range
+        ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_time t1) (format_time t2))
         ()
 end
 

@@ -46,6 +46,7 @@ module Range : sig
   | XY of float * float * float * float
   | Date of Date.t * Date.t
   | Time of Time.t * Time.t * Time.Zone.t
+  | Local_time of Time.t * Time.t  (* Time range in local time zone. *)
 end
 
 module Filling : sig
