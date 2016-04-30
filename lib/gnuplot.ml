@@ -191,7 +191,7 @@ module Output = struct
       cleanup = "set term x11";
     }
 
-  let default_cmd = to_cmd { font = Some "arial"; output = `Wxt }
+
 end
 
 module Grid = struct
@@ -419,11 +419,9 @@ module Gp = struct
       send_cmd t "e"
     | Func _ -> ()
 
-  let internal_set ?output ?title ?(use_grid=false)
-      ?fill ?range ?labels ?timefmtx t =
+  let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels ?timefmtx t =
     let commands =
-      [ Option.value_map output ~f:Output.to_cmd
-          ~default:Output.default_cmd |> Option.some
+      [ Option.map output ~f:Output.to_cmd
       ; Option.map title ~f:(fun title -> Title.(create ~title () |> to_cmd))
       ; Option.some_if use_grid Grid.to_cmd
       ; Option.map fill ~f:Filling.to_cmd

@@ -318,7 +318,7 @@ module Gp : sig
   (** [set ?output ?title ?fill t] sets parameters of the Gnuplot
       session. *)
   val set
-    :  ?output:Output.t  (* Wxt is default terminal *)
+    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
     -> ?title:string
     -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
@@ -336,7 +336,7 @@ module Gp : sig
   (** [plot t series] plots a single data [series].  The parameters for filling,
       range, etc are optional. *)
   val plot
-    :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
     -> ?title:string
     -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
@@ -350,7 +350,7 @@ module Gp : sig
   (** [plot_many t series] creates a plot of multiple data [series].  The
       parameters for filling, range, etc are optional. *)
   val plot_many
-    :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
     -> ?title:string
     -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
@@ -365,7 +365,7 @@ module Gp : sig
       The function [f] has to be specified in the Gnuplot format, eg `sin(x)`.
       The parameters for the filling, range, etc are optional. *)
   val plot_func
-    :  ?output:Output.t  (* Wxt is default terminal if not set otherwise *)
+    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
     -> ?title:string
     -> ?use_grid:bool    (* Defaults to false *)
     -> ?fill:Filling.t
