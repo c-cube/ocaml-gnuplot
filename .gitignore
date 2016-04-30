@@ -1,6 +1,7 @@
 *.native
 *.byte
 *.log
+*.png
 /setup.log
 /setup.data
 /setup.log

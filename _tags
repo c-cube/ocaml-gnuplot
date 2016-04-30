@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: c7a0a7b27e21e102e7d9cc5b5b0bde0a)
+# DO NOT EDIT (digest: 815f9dfb05d3392a28a77f03988a8293)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -22,6 +22,10 @@ true: annot, bin_annot
 <examples/simple_plot.{native,byte}>: package(core)
 <examples/simple_plot.{native,byte}>: package(threads)
 <examples/simple_plot.{native,byte}>: use_gnuplot
+# Executable save_plot
+<examples/save_plot.{native,byte}>: package(core)
+<examples/save_plot.{native,byte}>: package(threads)
+<examples/save_plot.{native,byte}>: use_gnuplot
 # Executable gaussian_noise
 <examples/gaussian_noise.{native,byte}>: package(core)
 <examples/gaussian_noise.{native,byte}>: package(threads)

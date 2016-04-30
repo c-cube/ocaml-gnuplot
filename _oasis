@@ -41,6 +41,14 @@ Executable "simple_plot"
   BuildDepends:    gnuplot
   CompiledObject:  best
 
+Executable "save_plot"
+  Build$:          flag(examples)
+  Path:            examples
+  MainIs:          save_plot.ml
+  Install:         false
+  BuildDepends:    gnuplot
+  CompiledObject:  best
+
 Executable "gaussian_noise"
   Build$:          flag(examples)
   Path:            examples
