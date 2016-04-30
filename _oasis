@@ -1,6 +1,6 @@
 OASISFormat:       0.4
 Name:              gnuplot
-Version:           0.5.1
+Version:           0.5.2
 Synopsis:          Simple interface to Gnuplot
 Description:       Gnuplot-OCaml provides a simple interface to Gnuplot
                    from OCaml. The API supports only 2D graphs and was

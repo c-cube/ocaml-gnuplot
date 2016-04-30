@@ -1,3 +1,7 @@
+2016-04-30: Use Gnuplot's default terminal if no output type is specified.
+
+2016-02-29: Use the local time zone as default in a time series plot.
+
 2016-02-28: Require time zone argument for plots with a time axis.
 
 2015-07-18: Initial public release.
