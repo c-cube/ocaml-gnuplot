@@ -19,6 +19,9 @@ From Source
     $ make
     $ make install
 
+__NOTE__: For a persistent X11 terminal add  `set term x11 persist` to your
+`.gnuplot` file in your home directory.
+
 Usage
 -----
 
