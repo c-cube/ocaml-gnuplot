@@ -23,17 +23,17 @@ open Core.Std
 open Printf
 
 module Color = struct
-  type t = [
-  | `Black
-  | `Red
-  | `Green
-  | `Yellow
-  | `Blue
-  | `Magenta
-  | `Cyan
-  | `White
-  | `Rgb of int * int * int
-  ]
+  type t =
+    [ `Black
+    | `Red
+    | `Green
+    | `Yellow
+    | `Blue
+    | `Magenta
+    | `Cyan
+    | `White
+    | `Rgb of int * int * int
+    ]
 
   let to_rgb = function
     | `Black -> 0, 0, 0
@@ -90,12 +90,12 @@ end
 
 module Range = struct
   type t =
-  | X  of float * float
-  | Y  of float * float
-  | XY of float * float * float * float
-  | Date of Date.t * Date.t
-  | Time of Time.t * Time.t * Time.Zone.t
-  | Local_time of Time.t * Time.t
+    | X  of float * float
+    | Y  of float * float
+    | XY of float * float * float * float
+    | Date of Date.t * Date.t
+    | Time of Time.t * Time.t * Time.Zone.t
+    | Local_time of Time.t * Time.t
 
   let range ?xspec ?yspec () =
     let sep = match xspec, yspec with
@@ -139,10 +139,10 @@ module Range = struct
 end
 
 module Filling = struct
-  type t = [
-  | `Solid
-  | `Pattern of int
-  ]
+  type t =
+    [ `Solid
+    | `Pattern of int
+    ]
 
   let to_cmd t =
     { Command.
@@ -152,13 +152,13 @@ module Filling = struct
 end
 
 module Output_type = struct
-  type t = [
-  | `Wxt
-  | `X11
-  | `Qt
-  | `Png of string | `Png_cairo of string
-  | `Eps of string
-  ]
+  type t =
+    [ `Wxt
+    | `X11
+    | `Qt
+    | `Png of string | `Png_cairo of string
+    | `Eps of string
+    ]
 end
 
 module Output = struct
@@ -255,21 +255,21 @@ module Timefmtx = struct
 end
 
 type kind =
-| Lines
-| Points
-| Linespoints
-| Steps
-| Histogram
-| Candlesticks
+  | Lines
+  | Points
+  | Linespoints
+  | Steps
+  | Histogram
+  | Candlesticks
 
 type data =
-| Data_Y of float list
-| Data_XY of (float * float) list
-| Data_TimeY of (Time.t * float) list * Time.Zone.t
-| Data_DateY of (Date.t * float) list
-| Data_TimeOHLC of (Time.t * (float * float * float * float)) list * Time.Zone.t
-| Data_DateOHLC of (Date.t * (float * float * float * float)) list
-| Func of string
+  | Data_Y of float list
+  | Data_XY of (float * float) list
+  | Data_TimeY of (Time.t * float) list * Time.Zone.t
+  | Data_DateY of (Date.t * float) list
+  | Data_TimeOHLC of (Time.t * (float * float * float * float)) list * Time.Zone.t
+  | Data_DateOHLC of (Date.t * (float * float * float * float)) list
+  | Func of string
 
 module Series = struct
   type t = {
@@ -290,16 +290,16 @@ module Series = struct
     let cmd =
       String.concat [
         (match data with
-        | Data_Y _ -> " '-' using 1 with " ^ kind_text
-        | Data_XY _ | Data_TimeY _ | Data_DateY _ ->
-          " '-' using 1:2 with " ^ kind_text
-        | Data_TimeOHLC _ | Data_DateOHLC _ ->
-          " '-' using 1:2:3:4:5 with " ^ kind_text
-        | Func f -> f ^ " with " ^ kind_text)
-        ; format_title title
-        ; format_num_arg "lw" weight
-        ; format_color "lc" color
-        ; format_fill fill ]
+         | Data_Y _ -> " '-' using 1 with " ^ kind_text
+         | Data_XY _ | Data_TimeY _ | Data_DateY _ ->
+           " '-' using 1:2 with " ^ kind_text
+         | Data_TimeOHLC _ | Data_DateOHLC _ ->
+           " '-' using 1:2:3:4:5 with " ^ kind_text
+         | Func f -> f ^ " with " ^ kind_text)
+      ; format_title title
+      ; format_num_arg "lw" weight
+      ; format_color "lc" color
+      ; format_fill fill ]
     in
     { cmd; data; }
 
@@ -451,14 +451,14 @@ module Gp = struct
 
   let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
     begin match (List.hd_exn data).Series.data with
-    | Data_TimeY _ | Data_TimeOHLC _ ->
-      let timefmtx = Timefmtx.create ?format timefmt in
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
-    | Data_DateY _ | Data_DateOHLC _ ->
-      let timefmtx = Timefmtx.create ?format datefmt in
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
-    | _ ->
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels t
+      | Data_TimeY _ | Data_TimeOHLC _ ->
+        let timefmtx = Timefmtx.create ?format timefmt in
+        internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
+      | Data_DateY _ | Data_DateOHLC _ ->
+        let timefmtx = Timefmtx.create ?format datefmt in
+        internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
+      | _ ->
+        internal_set ?output ?title ?use_grid ?fill ?range ?labels t
     end;
     let cmd =
       "plot \\\n" ^

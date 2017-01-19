@@ -26,34 +26,34 @@ open Core.Std
 module Color : sig
   (* Possible colors of a plot. *)
   type t = [
-  | `Black
-  | `Red
-  | `Green
-  | `Yellow
-  | `Blue
-  | `Magenta
-  | `Cyan
-  | `White
-  | `Rgb of int * int * int
+    | `Black
+    | `Red
+    | `Green
+    | `Yellow
+    | `Blue
+    | `Magenta
+    | `Cyan
+    | `White
+    | `Rgb of int * int * int
   ]
 end
 
 module Range : sig
   (** Used for constructing ranges for the X axis, Y axis or both. *)
   type t =
-  | X  of float * float
-  | Y  of float * float
-  | XY of float * float * float * float
-  | Date of Date.t * Date.t
-  | Time of Time.t * Time.t * Time.Zone.t
-  | Local_time of Time.t * Time.t  (* Time range in local time zone. *)
+    | X  of float * float
+    | Y  of float * float
+    | XY of float * float * float * float
+    | Date of Date.t * Date.t
+    | Time of Time.t * Time.t * Time.Zone.t
+    | Local_time of Time.t * Time.t  (* Time range in local time zone. *)
 end
 
 module Filling : sig
   (** Represents possible fillings of a plot. *)
   type t = [
-  | `Solid           (* Fill the plot with a solid fill. *)
-  | `Pattern of int  (* Fill the plot with a pre-defined Gnuplot pattern. *)
+    | `Solid           (* Fill the plot with a solid fill. *)
+    | `Pattern of int  (* Fill the plot with a pre-defined Gnuplot pattern. *)
   ]
 end
 
