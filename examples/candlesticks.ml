@@ -28,7 +28,7 @@ let () =
     List.zip_exn date_range (gen_bars ~num_bars:(Date.diff stop start + 1))
   in
   let num_days = 100 in
-  let stop = Date.today ~zone:Time.Zone.local in
+  let stop = Date.today ~zone:(Lazy.force Time.Zone.local) in
   let start = Date.add_days stop (-num_days) in
   let gp = Gp.create () in
   (* Plot a random candlestick chart. *)
