@@ -33,7 +33,7 @@ let asks, bids =
   |> flat_map ~f:group_by_action
   |> List.map ~f:aggregate
   |> List.partition_tf ~f:(fun b -> b.action = Sell)
-  |> Tuple.T2.map2 ~f:List.rev
+  |> Tuple.T2.map_snd ~f:List.rev
 
 let () =
   let aggregate bids =

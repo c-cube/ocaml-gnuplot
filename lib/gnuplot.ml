@@ -371,7 +371,7 @@ end
 
 module Gp = struct
   type t = {
-    channel : out_channel;
+    channel : Out_channel.t;
     verbose : bool;
   }
 
@@ -379,7 +379,7 @@ module Gp = struct
     let path = Option.value path ~default:"gnuplot" in
     { channel = Unix.open_process_out path; verbose }
 
-  let send_cmd t cmd = output_string t.channel (cmd^"\n")
+  let send_cmd t cmd = Out_channel.output_string t.channel (cmd^"\n")
 
   let close t = ignore (Unix.close_process_out t.channel)
 
@@ -467,7 +467,7 @@ module Gp = struct
     send_cmd t cmd;
     List.iter data ~f:(fun s -> send_data t s.Series.data);
     unset ?fill ?labels t;
-    flush t.channel
+    Out_channel.flush t.channel
 
   let plot ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
     plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format t [data]
