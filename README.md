@@ -28,7 +28,7 @@ Usage
 ### Documentation
 
 The API-documentation of this distribution can be built with `make doc`.
-It can also be found [online](http://ogu.bitbucket.org/gnuplot-ocaml/api/).
+It can also be found [online](http://ogu.bitbucket.io/gnuplot-ocaml/api/).
 
 ### Examples
 
@@ -46,7 +46,7 @@ This simple example
 
 generates the following plot:
 
-![Simple Plot](http://ogu.bitbucket.org/simple_plot.png)
+![Simple Plot](http://ogu.bitbucket.io/simple_plot.png)
 
 For more examples please refer to the `examples`-directory of this
 distribution.  You can build the examples by typing
@@ -60,7 +60,7 @@ For instance,
 
 shows 10 simulated paths of geometric Brownian motion:
 
-![GBM Paths](http://ogu.bitbucket.org/gbm_paths.png)
+![GBM Paths](http://ogu.bitbucket.io/gbm_paths.png)
 
 
 Contact Information
