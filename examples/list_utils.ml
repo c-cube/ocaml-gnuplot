@@ -1,4 +1,4 @@
-open Core.Std
+open Core
 
 let sample l ~size =
   let source = Array.of_list l in

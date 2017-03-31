@@ -8,7 +8,7 @@ Description:       Gnuplot-OCaml provides a simple interface to Gnuplot
 Authors:           Oliver Gu <gu.oliver@yahoo.com>
 Maintainers:       Oliver Gu <gu.oliver@yahoo.com>
 License:           LGPL-2.1+ with OCaml linking exception
-OCamlVersion:      >= 4.02.3
+OCamlVersion:      >= 4.03.0
 FindlibVersion:    >= 1.3.1
 Homepage:          https://bitbucket.org/ogu/gnuplot-ocaml
 Plugins:           META (0.4), StdFiles (0.4), DevFiles (0.4)
@@ -27,7 +27,7 @@ Library gnuplot
   Path:            lib
   FindlibName:     gnuplot
   Modules:         Gnuplot
-  BuildDepends:    core (>= 113.24.00),
+  BuildDepends:    core (>= 114.35.00),
                    threads
   CompiledObject:  best
 

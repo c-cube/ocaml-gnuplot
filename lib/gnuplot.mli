@@ -21,7 +21,7 @@
 
 (** Simple interface to Gnuplot *)
 
-open Core.Std
+open Core
 
 module Color : sig
   (* Possible colors of a plot. *)
