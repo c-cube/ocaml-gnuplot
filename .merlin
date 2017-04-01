@@ -1,7 +1,0 @@
-S lib
-S test
-S examples
-
-PKG core
-
-B _build/**
