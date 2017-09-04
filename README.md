@@ -49,16 +49,15 @@ generates the following plot:
 ![Simple Plot](http://ogu.bitbucket.io/simple_plot.png)
 
 For more examples please refer to the `examples`-directory of this
-distribution.  You can build the examples by typing
+distribution.  You can build the examples with jbuilder, e.g.
 
-    $ ./configure --enable-examples
-    $ make
+    $ jbuilder gbm_paths.exe
 
-For instance,
+Running
 
-    $ ./gbm_paths.native
+    $ _build/default/gbm_paths.exe
 
-shows 10 simulated paths of geometric Brownian motion:
+displays 10 simulated paths of geometric Brownian motion:
 
 ![GBM Paths](http://ogu.bitbucket.io/gbm_paths.png)
 
