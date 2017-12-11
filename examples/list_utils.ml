@@ -1,4 +1,4 @@
-open Core
+open Base
 
 let sample l ~size =
   let source = Array.of_list l in

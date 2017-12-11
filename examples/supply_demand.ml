@@ -1,4 +1,4 @@
-open Core
+open Base
 open Gnuplot
 open List_utils
 
@@ -32,8 +32,8 @@ let asks, bids =
   |> group_by_price
   |> flat_map ~f:group_by_action
   |> List.map ~f:aggregate
-  |> List.partition_tf ~f:(fun b -> b.action = Sell)
-  |> Tuple.T2.map_snd ~f:List.rev
+  |> List.partition_tf ~f:(fun b -> Caml.(b.action = Sell))
+  |> (fun (x,y) -> x, List.rev y)
 
 let () =
   let aggregate bids =
@@ -42,7 +42,7 @@ let () =
     | bid :: bids ->
       scan bids ~init:bid ~f:(fun b1 b2 ->
         { b1 with price = b2.price; volume = b1.volume + b2.volume })
-    end |> List.map ~f:(fun b -> float b.volume, float b.price)
+    end |> List.map ~f:(fun b -> Caml.float b.volume, Caml.float b.price)
   in
   let gp = Gp.create () in
   (* Plot supply and demand curve. *)

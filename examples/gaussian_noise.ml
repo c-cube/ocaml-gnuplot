@@ -1,16 +1,15 @@
-open Core
 open Gnuplot
 
 let () =
-  let pi = Float.(4.*.atan 1.) in
+  let pi = 4.*.atan 1. in
   let generate_noise () =
     (* Box-Muller transform *)
     let box_muller u1 u2 =
       let r = sqrt (-2. *. log u1) in
       let t = 2. *. pi *. u2 in
-      Float.(r *. cos t, r *. sin t)
+      r *. cos t, r *. sin t
     in
-    List.init 1000 ~f:(fun _ -> box_muller (Random.float 1.) (Random.float 1.))
+    Base.List.init 1000 ~f:(fun _ -> box_muller (Random.float 1.) (Random.float 1.))
   in
   let gp = Gp.create () in
   (* Scatter plot of a bivariate normal distribution. *)

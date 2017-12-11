@@ -6,4 +6,4 @@
     save_plot
     simple_plot
     supply_demand))
-  (libraries (core gnuplot))))
+  (libraries (base gnuplot calendar))))

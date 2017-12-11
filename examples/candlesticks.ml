@@ -1,4 +1,4 @@
-open Core
+open CalendarLib
 open Gnuplot
 
 let () =
@@ -23,15 +23,18 @@ let () =
     let cl = (lo +. hi) /. 2. in
     List.rev (loop num_bars [] (op, hi, lo, cl))
   in
-  let gen_data ~start ~stop =
-    let date_range = Date.dates_between ~min:start ~max:stop in
-    List.zip_exn date_range (gen_bars ~num_bars:(Date.diff stop start + 1))
+  let gen_data ~range ~start ~stop =
+    Base.List.zip_exn range (gen_bars ~num_bars:(List.length range))
   in
   let num_days = 100 in
-  let stop = Date.today ~zone:(Lazy.force Time.Zone.local) in
-  let start = Date.add_days stop (-num_days) in
+  let stop = Calendar.Date.today () in
+  let rec gen_range acc stop num_days =
+    if num_days=0 then stop, stop :: acc
+    else gen_range (stop :: acc) (Date.prev stop `Day) (num_days-1)
+  in
+  let start, date_range = gen_range [] stop num_days in
   let gp = Gp.create () in
   (* Plot a random candlestick chart. *)
-  Gp.plot gp ~range:(Range.Date (Date.add_days start (-1), Date.add_days stop 1))
-    ~format:"%b %d'%y" (Series.candles_date_ohlc (gen_data ~start ~stop));
+  Gp.plot gp ~range:(Range.Date (Date.prev start `Day, Date.next stop `Day))
+    ~format:"%b %d'%y" (Series.candles_date_ohlc (gen_data ~range:date_range ~start ~stop));
   Gp.close gp
