@@ -10,7 +10,9 @@ build: [
   ["jbuilder" "build" "-p" name "-j" jobs]
 ]
 depends: [
-  "core"
+  "base"
+  "stdio"
+  "calendar"
   "conf-gnuplot"
   "jbuilder" {build & >= "1.0+beta2"}
 ]

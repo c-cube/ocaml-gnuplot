@@ -21,7 +21,8 @@
 
 (** Simple interface to Gnuplot *)
 
-open Core
+open Base
+open CalendarLib
 
 module Color : sig
   (* Possible colors of a plot. *)
@@ -38,15 +39,19 @@ module Color : sig
   ]
 end
 
+type date = Date.t
+type time = Calendar.t
+type timezone = Time_Zone.t
+
 module Range : sig
   (** Used for constructing ranges for the X axis, Y axis or both. *)
   type t =
     | X  of float * float
     | Y  of float * float
     | XY of float * float * float * float
-    | Date of Date.t * Date.t
-    | Time of Time.t * Time.t * Time.Zone.t
-    | Local_time of Time.t * Time.t  (* Time range in local time zone. *)
+    | Date of date * date
+    | Time of time * time * timezone
+    | Local_time of time * time  (* Time range in local time zone. *)
 end
 
 module Filling : sig
@@ -113,8 +118,8 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
-    -> (Time.t * float) list
+    -> zone:timezone
+    -> (time * float) list
     -> t
 
   (** [lines_datey data] creates a data series for a line plot of date and Y
@@ -123,7 +128,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> (Date.t * float) list
+    -> (date * float) list
     -> t
 
   (** [lines_func f] creates a data series for a line plot of the values given
@@ -160,8 +165,8 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
-    -> (Time.t * float) list
+    -> zone:timezone
+    -> (time * float) list
     -> t
 
   (** [points_datey data] creates a data series for a point plot of date and Y
@@ -170,7 +175,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> (Date.t * float) list
+    -> (date * float) list
     -> t
 
   (** [points_func f] creates a data series for a point plot of the values given
@@ -208,8 +213,8 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
-    -> (Time.t * float) list
+    -> zone:timezone
+    -> (time * float) list
     -> t
 
   (** [linespoints_datey data] creates a data series for a lines and points plot
@@ -218,7 +223,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> (Date.t * float) list
+    -> (date * float) list
     -> t
 
   (** [linespoints_func f] creates a data series for a lines and points plot of
@@ -255,8 +260,8 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> zone:Time.Zone.t
-    -> (Time.t * float) list
+    -> zone:timezone
+    -> (time * float) list
     -> t
 
   (** [steps_datey data] creates a data series for a step function of date and Y
@@ -265,7 +270,7 @@ module Series : sig
     :  ?title:string
     -> ?color:Color.t
     -> ?weight:int
-    -> (Date.t * float) list
+    -> (date * float) list
     -> t
 
   (** [histogram data] creates a data series for a histogram of Y values. *)
@@ -284,8 +289,8 @@ module Series : sig
     -> ?color:Color.t
     -> ?weight:int
     -> ?fill:Filling.t
-    -> zone:Time.Zone.t
-    -> (Time.t * (float * float * float * float)) list
+    -> zone:timezone
+    -> (time * (float * float * float * float)) list
     -> t
 
   (** [candles_date_ohlc data] creates a data series for a candlestick chart
@@ -295,7 +300,7 @@ module Series : sig
     -> ?color:Color.t
     -> ?weight:int
     -> ?fill:Filling.t
-    -> (Date.t * (float * float * float * float)) list
+    -> (date * (float * float * float * float)) list
     -> t
 end
 

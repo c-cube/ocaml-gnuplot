@@ -19,7 +19,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *)
 
-open Core
+open Base
+open Stdio
+open CalendarLib
 open Printf
 
 module Color = struct
@@ -47,15 +49,21 @@ module Color = struct
     | `Rgb (r, g, b) -> r, g, b
 end
 
+type date = Date.t
+type time = Calendar.t
+type timezone = Time_Zone.t
+
+let datefmt = "%Y-%m-%d"
+let timefmt = "%Y-%m-%d-%H:%M:%S%:z"
+
 let format_style = function
   | `Solid -> " fs solid"
   | `Pattern n -> sprintf " fs pattern %d" n
 
-let datefmt = "%Y-%m-%d"
-let timefmt = "%Y-%m-%d-%H:%M:%S"
-
-let format_date d = Date.format d datefmt
-let format_time t ~zone = Time.format t timefmt ~zone
+let format_date d : string = CalendarLib.Printer.Date.sprint datefmt d
+let format_time t ~zone =
+  let t = Calendar.convert t Time_Zone.UTC zone in
+  CalendarLib.Printer.Calendar.sprint timefmt t
 let format_num = Float.to_string
 
 module Internal_format = struct
@@ -91,9 +99,9 @@ module Range = struct
     | X  of float * float
     | Y  of float * float
     | XY of float * float * float * float
-    | Date of Date.t * Date.t
-    | Time of Time.t * Time.t * Time.Zone.t
-    | Local_time of Time.t * Time.t
+    | Date of date * date
+    | Time of time * time * timezone
+    | Local_time of time * time
 
   let range ?xspec ?yspec () =
     let sep = match xspec, yspec with
@@ -131,7 +139,7 @@ module Range = struct
         ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_time t1 ~zone) (format_time t2 ~zone))
         ()
     | Local_time (t1, t2) ->
-      let zone = Lazy.force Time.Zone.local in
+      let zone = Time_Zone.current () in
       range
         ~xspec:(sprintf "[\"%s\":\"%s\"]" (format_time t1 ~zone) (format_time t2~zone))
         ()
@@ -227,7 +235,7 @@ module Labels = struct
     let cmd =
       [ format_label "xlabel" t.x, "set xlabel"
       ; format_label "ylabel" t.y, "set ylabel"
-      ] |> List.filter ~f:(fun (s, _) -> s <> "")
+      ] |> List.filter ~f:(fun (s, _) -> not (String.equal s ""))
     in
     { Command.
       command = cmd |> List.map ~f:fst |> String.concat ~sep:"\n";
@@ -241,12 +249,12 @@ module Timefmtx = struct
     format  : string option;
   }
 
-  let create ?format timefmt = { timefmt; format; }
+  let create ?format timefmt = { format; timefmt }
 
   let to_cmd t =
     { Command.
       command =
-        [ Some ("set timefmt \""^t.timefmt^"\"\nset xdata time")
+        [ Some ("set timefmt \""^ t.timefmt ^ "\"\nset xdata time")
         ; Option.map t.format ~f:(fun fmt -> "\nset format x \""^fmt^"\"")
         ] |> List.filter_opt |> String.concat;
       cleanup = "set xdata";
@@ -264,10 +272,10 @@ type kind =
 type data =
   | Data_Y of float list
   | Data_XY of (float * float) list
-  | Data_TimeY of (Time.t * float) list * Time.Zone.t
-  | Data_DateY of (Date.t * float) list
-  | Data_TimeOHLC of (Time.t * (float * float * float * float)) list * Time.Zone.t
-  | Data_DateOHLC of (Date.t * (float * float * float * float)) list
+  | Data_TimeY of (time * float) list * timezone
+  | Data_DateY of (date * float) list
+  | Data_TimeOHLC of (time * (float * float * float * float)) list * timezone
+  | Data_DateOHLC of (date * (float * float * float * float)) list
   | Func of string
 
 module Series = struct
@@ -443,7 +451,7 @@ module Gp = struct
       ] |> List.filter_opt
     in
     List.iter commands ~f:(fun cmd ->
-      if cmd.Command.cleanup <> "" then begin
+      if not (String.equal cmd.Command.cleanup "") then begin
         if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.cleanup;
         send_cmd t cmd.Command.cleanup
       end)
