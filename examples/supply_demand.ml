@@ -23,7 +23,7 @@ let generate_auction_data () =
 let asks, bids =
   let group_by_price = group_by ~f:(fun q -> q.price) in
   let group_by_action = group_by ~f:(fun q -> q.action) in
-  let flat_map l ~f = List.bind l f in
+  let flat_map l ~f = List.bind l ~f in
   let aggregate bids =
     List.reduce_exn bids ~f:(fun b1 b2 ->
       { b1 with volume = b1.volume + b2.volume })
@@ -50,4 +50,5 @@ let () =
   Gp.plot_many gp ~labels:(Labels.create ~x:"Volume" ~y:"Price" ())
     [ Series.steps_xy (aggregate asks) ~title:"Sell" ~color:`Green
     ; Series.steps_xy (aggregate bids) ~title:"Buy"  ~color:`Red ];
+  Unix.sleep 10;
   Gp.close gp

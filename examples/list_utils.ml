@@ -7,8 +7,8 @@ let sample l ~size =
 ;;
 
 let group_by l ~f =
-  List.sort l ~cmp:(fun x1 x2 -> Poly.compare (f x1) (f x2))
-  |> List.group ~break:(fun x1 x2 -> f x1 <> f x2)
+  List.sort l ~compare:(fun x1 x2 -> Poly.compare (f x1) (f x2))
+  |> List.group ~break:(fun x1 x2 -> not (Poly.equal (f x1) (f x2)))
 ;;
 
 let scan l ~init ~f =

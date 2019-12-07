@@ -1,4 +1,3 @@
-open CalendarLib
 open Gnuplot
 
 let () =
@@ -23,18 +22,18 @@ let () =
     let cl = (lo +. hi) /. 2. in
     List.rev (loop num_bars [] (op, hi, lo, cl))
   in
-  let gen_data ~range ~start ~stop =
+  let gen_data ~range =
     Base.List.zip_exn range (gen_bars ~num_bars:(List.length range))
   in
   let num_days = 100 in
-  let stop = Calendar.Date.today () in
+  let stop = Unix.gettimeofday() in
   let rec gen_range acc stop num_days =
     if num_days=0 then stop, stop :: acc
-    else gen_range (stop :: acc) (Date.prev stop `Day) (num_days-1)
+    else gen_range (stop :: acc) (stop -. (3600. *. 24.)) (num_days-1)
   in
   let start, date_range = gen_range [] stop num_days in
   let gp = Gp.create () in
   (* Plot a random candlestick chart. *)
-  Gp.plot gp ~range:(Range.Date (Date.prev start `Day, Date.next stop `Day))
-    ~format:"%b %d'%y" (Series.candles_date_ohlc (gen_data ~range:date_range ~start ~stop));
+  Gp.plot gp ~range:(Range.Date (start -. 3600. *. 24., stop +. 3600. *. 24.))
+    ~format:"%D'%Y" (Series.candles_date_ohlc (gen_data ~range:date_range));
   Gp.close gp
