@@ -35,5 +35,6 @@ let () =
   let gp = Gp.create () in
   (* Plot a random candlestick chart. *)
   Gp.plot gp ~range:(Range.Date (start -. 3600. *. 24., stop +. 3600. *. 24.))
-    ~format:"%D'%Y" (Series.candles_date_ohlc (gen_data ~range:date_range));
+    ~format:"%b %d'%y" (Series.candles_date_ohlc (gen_data ~range:date_range));
+  Unix.sleep 10;
   Gp.close gp

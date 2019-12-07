@@ -63,9 +63,8 @@ let dateprint fmt d tz : string =
   in
   Format.asprintf "%a" pp ()
 
-let format_date d : string = dateprint datefmt d 0.
-let format_time t ~zone =
-  dateprint timefmt t zone
+let format_date d : string = dateprint "%Y-%M-%D" d 0.
+let format_time t ~zone = dateprint "%Y-%M-%D-%h:%m:%s:%Z" t zone
 let format_num = string_of_float
 
 let opt_value_map default ~f = function
