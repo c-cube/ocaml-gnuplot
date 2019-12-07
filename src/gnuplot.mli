@@ -21,9 +21,6 @@
 
 (** Simple interface to Gnuplot *)
 
-open Base
-open CalendarLib
-
 module Color : sig
   (* Possible colors of a plot. *)
   type t = [
@@ -39,9 +36,9 @@ module Color : sig
   ]
 end
 
-type date = Date.t
-type time = Calendar.t
-type timezone = Time_Zone.t
+type date = float
+type time = float
+type timezone = float
 
 module Range : sig
   (** Used for constructing ranges for the X axis, Y axis or both. *)

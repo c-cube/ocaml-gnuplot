@@ -1,4 +1,4 @@
 (library
  (name gnuplot)
  (public_name gnuplot)
- (libraries base calendar stdio))
+ (libraries unix ISO8601))
