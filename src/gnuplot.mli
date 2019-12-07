@@ -19,10 +19,10 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *)
 
-(** Simple interface to Gnuplot *)
+(** {1 Simple interface to Gnuplot} *)
 
 module Color : sig
-  (* Possible colors of a plot. *)
+  (** Possible colors of a plot. *)
   type t = [
     | `Black
     | `Red
@@ -45,17 +45,25 @@ module Range : sig
   type t =
     | X  of float * float
     | Y  of float * float
-    | XY of float * float * float * float
+    | XY of float * float * float * float (** arguments are [x1, x2, y1, y2] *)
     | Date of date * date
     | Time of time * time * timezone
-    | Local_time of time * time  (* Time range in local time zone. *)
+    | Local_time of time * time  (** Time range in local time zone. *)
 end
+
+type range = Range.t =
+  | X  of float * float
+  | Y  of float * float
+  | XY of float * float * float * float (** arguments are [x1, x2, y1, y2] *)
+  | Date of date * date
+  | Time of time * time * timezone
+  | Local_time of time * time  (** Time range in local time zone. *)
 
 module Filling : sig
   (** Represents possible fillings of a plot. *)
   type t = [
-    | `Solid           (* Fill the plot with a solid fill. *)
-    | `Pattern of int  (* Fill the plot with a pre-defined Gnuplot pattern. *)
+    | `Solid           (** Fill the plot with a solid fill. *)
+    | `Pattern of int  (** Fill the plot with a pre-defined Gnuplot pattern. *)
   ]
 end
 
@@ -65,27 +73,21 @@ module Output : sig
 
   (** [create ?font output] creates an output type with optional [font]
       parameter. *)
-  val create
-    :  ?font:string
-    -> [ `Wxt  (* Wxt terminal device generates output in a separate window. *)
-       | `X11  (* X11 terminal device for use with X servers. *)
-       | `Qt   (* Qt  terminal device generates output in a separate window. *)
-       | `Png of string  (* For saving charts to a PNG file. *)
-       | `Png_cairo of string  (* Same as [`Png], but uses Cairo libs for rendering. *)
-       | `Eps of string  (* For saving charts to an EPS file. *)
-       ]
-    -> t
+  val create :  ?font:string ->
+    [ `Wxt  (** Wxt terminal device generates output in a separate window. *)
+    | `X11  (** X11 terminal device for use with X servers. *)
+    | `Qt   (** Qt  terminal device generates output in a separate window. *)
+    | `Png of string  (** For saving charts to a PNG file. *)
+    | `Png_cairo of string  (** Same as [`Png], but uses Cairo libs for rendering. *)
+    | `Eps of string  (** For saving charts to an EPS file. *)
+    ] -> t
 end
 
 module Labels : sig
-  (* Specifies labels for the X and Y axes. *)
+  (** Specifies labels for the X and Y axes. *)
   type t
 
-  val create
-    :  ?x:string
-    -> ?y:string
-    -> unit
-    -> t
+  val create :  ?x:string -> ?y:string -> unit -> t
 end
 
 module Series : sig
@@ -316,6 +318,15 @@ module Gp : sig
 
   (** [close t] closes the channel to the Gnuplot process. *)
   val close : t -> unit
+
+  (** [with_ ?verbose ?path f] creates a channel to a Gnuplot process,
+      using {!create}. Then it calls [f] with this channel, and makes sure
+      to {!close} the channel once [f] is done. *)
+  val with_
+    :  ?verbose:bool (* defaults to false  *)
+    -> ?path:string  (* defaults to `gnuplot` *)
+    -> (t -> 'a)
+    -> 'a
 
   (** [set ?output ?title ?fill t] sets parameters of the Gnuplot
       session. *)

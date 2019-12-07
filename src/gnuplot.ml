@@ -162,6 +162,14 @@ module Range = struct
         ()
 end
 
+type range = Range.t =
+  | X  of float * float
+  | Y  of float * float
+  | XY of float * float * float * float (** arguments are [x1, x2, y1, y2] *)
+  | Date of date * date
+  | Time of time * time * timezone
+  | Local_time of time * time  (** Time range in local time zone. *)
+
 module Filling = struct
   type t =
     [ `Solid
@@ -214,8 +222,6 @@ module Output = struct
       command = output;
       cleanup = "set term x11";
     }
-
-
 end
 
 module Grid = struct
@@ -407,6 +413,16 @@ module Gp = struct
   let send_cmd t cmd = output_string t.channel (cmd^"\n")
 
   let close t = ignore (Unix.close_process_out t.channel)
+
+  let with_ ?verbose ?path f =
+    let c = create ?verbose ?path () in
+    try
+      let y = f c in
+      close c;
+      y
+    with e ->
+      close c;
+      raise e
 
   let send_data t data =
     match data with
