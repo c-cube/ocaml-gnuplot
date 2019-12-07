@@ -1,4 +1,4 @@
-open Gnuplot
+module Gp = Gnuplot
 
 let () =
   (* Generate random candlestick bars. *)
@@ -34,7 +34,7 @@ let () =
   let start, date_range = gen_range [] stop num_days in
   let gp = Gp.create () in
   (* Plot a random candlestick chart. *)
-  Gp.plot gp ~range:(Range.Date (start -. 3600. *. 24., stop +. 3600. *. 24.))
-    ~format:"%b %d'%y" (Series.candles_date_ohlc (gen_data ~range:date_range));
+  Gp.plot gp ~range:(Gp.Date (start -. 3600. *. 24., stop +. 3600. *. 24.))
+    ~format:"%b %d'%y" (Gp.Series.candles_date_ohlc (gen_data ~range:date_range));
   Unix.sleep 10;
   Gp.close gp

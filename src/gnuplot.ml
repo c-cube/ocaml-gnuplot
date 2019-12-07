@@ -400,125 +400,123 @@ module Series = struct
     create ?title ?color ?weight ?fill Candlesticks (Data_DateOHLC data)
 end
 
-module Gp = struct
-  type t = {
-    channel : out_channel;
-    verbose : bool;
-  }
+type t = {
+  channel : out_channel;
+  verbose : bool;
+}
 
-  let create ?(verbose = false) ?path () =
-    let path = Option.value path ~default:"gnuplot" in
-    { channel = Unix.open_process_out path; verbose }
+let create ?(verbose = false) ?path () =
+  let path = Option.value path ~default:"gnuplot" in
+  { channel = Unix.open_process_out path; verbose }
 
-  let send_cmd t cmd = output_string t.channel (cmd^"\n")
+let send_cmd t cmd = output_string t.channel (cmd^"\n")
 
-  let close t = ignore (Unix.close_process_out t.channel)
+let close t = ignore (Unix.close_process_out t.channel)
 
-  let with_ ?verbose ?path f =
-    let c = create ?verbose ?path () in
-    try
-      let y = f c in
-      close c;
-      y
-    with e ->
-      close c;
-      raise e
+let with_ ?verbose ?path f =
+  let c = create ?verbose ?path () in
+  try
+    let y = f c in
+    close c;
+    y
+  with e ->
+    close c;
+    raise e
 
-  let send_data t data =
-    match data with
-    | Data_Y data ->
-      List.iter (fun y -> send_cmd t (format_num y)) data;
-      send_cmd t "e"
-    | Data_XY data ->
-      List.iter (fun (x, y) ->
-          send_cmd t (format_num x ^" "^ format_num y))
-        data;
-      send_cmd t "e"
-    | Data_TimeY (data, zone) ->
-      List.iter (fun (tm, y) ->
-          send_cmd t (format_time tm ~zone ^" "^ format_num y))
-        data;
-      send_cmd t "e"
-    | Data_DateY data ->
-      List.iter (fun (d, y) ->
-          send_cmd t (format_date d ^" "^ format_num y))
-        data;
-      send_cmd t "e"
-    | Data_TimeOHLC (data, zone) ->
-      List.iter (fun (tm, (o, h, l, c)) ->
-        send_cmd t (format_time tm ~zone ^" "^
-                    format_num         o ^" "^
-                    format_num         h ^" "^
-                    format_num         l ^" "^
-                    format_num         c))
-        data;
-      send_cmd t "e"
-    | Data_DateOHLC data ->
-      List.iter (fun (d, (o, h, l, c)) ->
-        send_cmd t (format_date d ^" "^
-                    format_num  o ^" "^
-                    format_num  h ^" "^
-                    format_num  l ^" "^
-                    format_num  c))
-        data;
-      send_cmd t "e"
-    | Func _ -> ()
+let send_data t data =
+  match data with
+  | Data_Y data ->
+    List.iter (fun y -> send_cmd t (format_num y)) data;
+    send_cmd t "e"
+  | Data_XY data ->
+    List.iter (fun (x, y) ->
+        send_cmd t (format_num x ^" "^ format_num y))
+      data;
+    send_cmd t "e"
+  | Data_TimeY (data, zone) ->
+    List.iter (fun (tm, y) ->
+        send_cmd t (format_time tm ~zone ^" "^ format_num y))
+      data;
+    send_cmd t "e"
+  | Data_DateY data ->
+    List.iter (fun (d, y) ->
+        send_cmd t (format_date d ^" "^ format_num y))
+      data;
+    send_cmd t "e"
+  | Data_TimeOHLC (data, zone) ->
+    List.iter (fun (tm, (o, h, l, c)) ->
+      send_cmd t (format_time tm ~zone ^" "^
+                  format_num         o ^" "^
+                  format_num         h ^" "^
+                  format_num         l ^" "^
+                  format_num         c))
+      data;
+    send_cmd t "e"
+  | Data_DateOHLC data ->
+    List.iter (fun (d, (o, h, l, c)) ->
+      send_cmd t (format_date d ^" "^
+                  format_num  o ^" "^
+                  format_num  h ^" "^
+                  format_num  l ^" "^
+                  format_num  c))
+      data;
+    send_cmd t "e"
+  | Func _ -> ()
 
-  let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels ?timefmtx t =
-    let commands =
-      [ opt_map output ~f:Output.to_cmd
-      ; opt_map title ~f:(fun title -> Title.(create ~title () |> to_cmd))
-      ; (if use_grid then Some Grid.to_cmd else None)
-      ; opt_map fill ~f:Filling.to_cmd
-      ; opt_map timefmtx ~f:Timefmtx.to_cmd
-      ; opt_map range ~f:Range.to_cmd
-      ; opt_map labels ~f:Labels.to_cmd
-      ] |> list_filter_opt
-    in
-    List.iter (fun cmd ->
-      if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
-      send_cmd t cmd.Command.command)
-      commands 
+let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels ?timefmtx t =
+  let commands =
+    [ opt_map output ~f:Output.to_cmd
+    ; opt_map title ~f:(fun title -> Title.(create ~title () |> to_cmd))
+    ; (if use_grid then Some Grid.to_cmd else None)
+    ; opt_map fill ~f:Filling.to_cmd
+    ; opt_map timefmtx ~f:Timefmtx.to_cmd
+    ; opt_map range ~f:Range.to_cmd
+    ; opt_map labels ~f:Labels.to_cmd
+    ] |> list_filter_opt
+  in
+  List.iter (fun cmd ->
+    if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
+    send_cmd t cmd.Command.command)
+    commands 
 
-  let set ?output ?title ?use_grid ?fill ?labels t =
-    internal_set ?output ?title ?use_grid ?fill ?labels t
+let set ?output ?title ?use_grid ?fill ?labels t =
+  internal_set ?output ?title ?use_grid ?fill ?labels t
 
-  let unset ?fill ?labels t =
-    let commands =
-      [ opt_map fill ~f:Filling.to_cmd
-      ; opt_map labels ~f:Labels.to_cmd
-      ] |> list_filter_opt
-    in
-    List.iter (fun cmd ->
-      if not (String.equal cmd.Command.cleanup "") then begin
-        if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.cleanup;
-        send_cmd t cmd.Command.cleanup
-      end) commands 
+let unset ?fill ?labels t =
+  let commands =
+    [ opt_map fill ~f:Filling.to_cmd
+    ; opt_map labels ~f:Labels.to_cmd
+    ] |> list_filter_opt
+  in
+  List.iter (fun cmd ->
+    if not (String.equal cmd.Command.cleanup "") then begin
+      if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.cleanup;
+      send_cmd t cmd.Command.cleanup
+    end) commands 
 
-  let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
-    begin match (List.hd data).Series.data with
-      | Data_TimeY _ | Data_TimeOHLC _ ->
-        let timefmtx = Timefmtx.create ?format timefmt in
-        internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
-      | Data_DateY _ | Data_DateOHLC _ ->
-        let timefmtx = Timefmtx.create ?format datefmt in
-        internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
-      | _ ->
-        internal_set ?output ?title ?use_grid ?fill ?range ?labels t
-    end;
-    let cmd =
-      "plot \\\n" ^
-      (List.map (fun s -> s.Series.cmd) data |> String.concat ", \\\n")
-    in
-    if t.verbose then printf "Command: %s\n%!" cmd;
-    send_cmd t cmd;
-    List.iter (fun s -> send_data t s.Series.data) data;
-    unset ?fill ?labels t;
-    flush t.channel
+let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
+  begin match (List.hd data).Series.data with
+    | Data_TimeY _ | Data_TimeOHLC _ ->
+      let timefmtx = Timefmtx.create ?format timefmt in
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
+    | Data_DateY _ | Data_DateOHLC _ ->
+      let timefmtx = Timefmtx.create ?format datefmt in
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
+    | _ ->
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels t
+  end;
+  let cmd =
+    "plot \\\n" ^
+    (List.map (fun s -> s.Series.cmd) data |> String.concat ", \\\n")
+  in
+  if t.verbose then printf "Command: %s\n%!" cmd;
+  send_cmd t cmd;
+  List.iter (fun s -> send_data t s.Series.data) data;
+  unset ?fill ?labels t;
+  flush t.channel
 
-  let plot ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
-    plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format t [data]
+let plot ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
+  plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format t [data]
 
-  let plot_func ?output ?title ?use_grid ?fill ?range ?labels t func =
-    plot_many ?output ?title ?use_grid ?fill ?range ?labels t [Series.lines_func func]
-end
+let plot_func ?output ?title ?use_grid ?fill ?range ?labels t func =
+  plot_many ?output ?title ?use_grid ?fill ?range ?labels t [Series.lines_func func]

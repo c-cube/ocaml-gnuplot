@@ -21,6 +21,8 @@
 
 (** {1 Simple interface to Gnuplot} *)
 
+(** {2 Auxiliary types} *)
+
 module Color : sig
   (** Possible colors of a plot. *)
   type t = [
@@ -303,88 +305,88 @@ module Series : sig
     -> t
 end
 
-module Gp : sig
-  (** A wrapper for calling Gnuplot from OCaml. *)
-  type t
+(** {2 Main interface} *)
 
-  (** [create ?verbose ?path ()] creates a channel to a Gnuplot process with the
-      executable given by [path].  If [verbose] is true then plotting commands
-      print debug information on standard output. *)
-  val create
-    :  ?verbose:bool (* defaults to false  *)
-    -> ?path:string  (* defaults to `gnuplot` *)
-    -> unit
-    -> t
+(** A wrapper for calling Gnuplot from OCaml. *)
+type t
 
-  (** [close t] closes the channel to the Gnuplot process. *)
-  val close : t -> unit
+(** [create ?verbose ?path ()] creates a channel to a Gnuplot process with the
+    executable given by [path].  If [verbose] is true then plotting commands
+    print debug information on standard output. *)
+val create
+  :  ?verbose:bool (* defaults to false  *)
+  -> ?path:string  (* defaults to `gnuplot` *)
+  -> unit
+  -> t
 
-  (** [with_ ?verbose ?path f] creates a channel to a Gnuplot process,
-      using {!create}. Then it calls [f] with this channel, and makes sure
-      to {!close} the channel once [f] is done. *)
-  val with_
-    :  ?verbose:bool (* defaults to false  *)
-    -> ?path:string  (* defaults to `gnuplot` *)
-    -> (t -> 'a)
-    -> 'a
+(** [close t] closes the channel to the Gnuplot process. *)
+val close : t -> unit
 
-  (** [set ?output ?title ?fill t] sets parameters of the Gnuplot
-      session. *)
-  val set
-    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
-    -> ?title:string
-    -> ?use_grid:bool    (* Defaults to false *)
-    -> ?fill:Filling.t
-    -> ?labels:Labels.t
-    -> t
-    -> unit
+(** [with_ ?verbose ?path f] creates a channel to a Gnuplot process,
+    using {!create}. Then it calls [f] with this channel, and makes sure
+    to {!close} the channel once [f] is done. *)
+val with_
+  :  ?verbose:bool (* defaults to false  *)
+  -> ?path:string  (* defaults to `gnuplot` *)
+  -> (t -> 'a)
+  -> 'a
 
-  (** [unset ?fill ?labels t] resets parameters of the Gnuplot session. *)
-  val unset
-    :  ?fill:Filling.t
-    -> ?labels:Labels.t
-    -> t
-    -> unit
+(** [set ?output ?title ?fill t] sets parameters of the Gnuplot
+    session. *)
+val set
+  :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
+  -> ?title:string
+  -> ?use_grid:bool    (* Defaults to false *)
+  -> ?fill:Filling.t
+  -> ?labels:Labels.t
+  -> t
+  -> unit
 
-  (** [plot t series] plots a single data [series].  The parameters for filling,
-      range, etc are optional. *)
-  val plot
-    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
-    -> ?title:string
-    -> ?use_grid:bool    (* Defaults to false *)
-    -> ?fill:Filling.t
-    -> ?range:Range.t
-    -> ?labels:Labels.t
-    -> ?format:string
-    -> t
-    -> Series.t
-    -> unit
+(** [unset ?fill ?labels t] resets parameters of the Gnuplot session. *)
+val unset
+  :  ?fill:Filling.t
+  -> ?labels:Labels.t
+  -> t
+  -> unit
 
-  (** [plot_many t series] creates a plot of multiple data [series].  The
-      parameters for filling, range, etc are optional. *)
-  val plot_many
-    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
-    -> ?title:string
-    -> ?use_grid:bool    (* Defaults to false *)
-    -> ?fill:Filling.t
-    -> ?range:Range.t
-    -> ?labels:Labels.t
-    -> ?format:string
-    -> t
-    -> Series.t list
-    -> unit
+(** [plot t series] plots a single data [series].  The parameters for filling,
+    range, etc are optional. *)
+val plot
+  :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
+  -> ?title:string
+  -> ?use_grid:bool    (* Defaults to false *)
+  -> ?fill:Filling.t
+  -> ?range:Range.t
+  -> ?labels:Labels.t
+  -> ?format:string
+  -> t
+  -> Series.t
+  -> unit
 
-  (** [plot_func t f] draws a graph of the function [f] given as a string.
-      The function [f] has to be specified in the Gnuplot format, eg `sin(x)`.
-      The parameters for the filling, range, etc are optional. *)
-  val plot_func
-    :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
-    -> ?title:string
-    -> ?use_grid:bool    (* Defaults to false *)
-    -> ?fill:Filling.t
-    -> ?range:Range.t
-    -> ?labels:Labels.t
-    -> t
-    -> string
-    -> unit
-end
+(** [plot_many t series] creates a plot of multiple data [series].  The
+    parameters for filling, range, etc are optional. *)
+val plot_many
+  :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
+  -> ?title:string
+  -> ?use_grid:bool    (* Defaults to false *)
+  -> ?fill:Filling.t
+  -> ?range:Range.t
+  -> ?labels:Labels.t
+  -> ?format:string
+  -> t
+  -> Series.t list
+  -> unit
+
+(** [plot_func t f] draws a graph of the function [f] given as a string.
+    The function [f] has to be specified in the Gnuplot format, eg `sin(x)`.
+    The parameters for the filling, range, etc are optional. *)
+val plot_func
+  :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
+  -> ?title:string
+  -> ?use_grid:bool    (* Defaults to false *)
+  -> ?fill:Filling.t
+  -> ?range:Range.t
+  -> ?labels:Labels.t
+  -> t
+  -> string
+  -> unit

@@ -1,5 +1,5 @@
 open Base
-open Gnuplot
+module Gp = Gnuplot
 open List_utils
 
 let () = Random.init 100  (* For reproducability. *)
@@ -47,8 +47,8 @@ let () =
   let gp = Gp.create () in
   (* Plot supply and demand curve. *)
   Gp.set gp ~title:"Supply and Demand";
-  Gp.plot_many gp ~labels:(Labels.create ~x:"Volume" ~y:"Price" ())
-    [ Series.steps_xy (aggregate asks) ~title:"Sell" ~color:`Green
-    ; Series.steps_xy (aggregate bids) ~title:"Buy"  ~color:`Red ];
+  Gp.plot_many gp ~labels:(Gp.Labels.create ~x:"Volume" ~y:"Price" ())
+    [ Gp.Series.steps_xy (aggregate asks) ~title:"Sell" ~color:`Green
+    ; Gp.Series.steps_xy (aggregate bids) ~title:"Buy"  ~color:`Red ];
   Unix.sleep 10;
   Gp.close gp

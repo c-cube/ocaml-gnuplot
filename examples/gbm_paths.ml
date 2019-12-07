@@ -1,4 +1,4 @@
-open Gnuplot
+module Gp = Gnuplot
 
 let normal_gen ~mu ~sigma () =
   let u = Random.float 1.0 in
@@ -26,6 +26,6 @@ let () =
   let paths = gbm_paths ~s0:100. ~r:0.05 ~sigma:0.2 ~t:10. ~n:1000 ~m:10 in
   let gp = Gp.create () in
   Gp.set gp ~title:"Ten simulated paths of GBM" ~use_grid:true;
-  Gp.plot_many gp ~labels:(Labels.create ~x:"Time in years" ~y:"Price" ())
-    (Base.List.map paths ~f:(fun path -> Series.lines_xy path));
+  Gp.plot_many gp ~labels:(Gp.Labels.create ~x:"Time in years" ~y:"Price" ())
+    (Base.List.map paths ~f:(fun path -> Gp.Series.lines_xy path));
   Gp.close gp
