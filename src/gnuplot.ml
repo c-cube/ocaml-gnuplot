@@ -406,7 +406,7 @@ type t = {
 }
 
 let create ?(verbose = false) ?path () =
-  let path = Option.value path ~default:"gnuplot" in
+  let path = match path with Some p -> p | None -> "gnuplot" in
   { channel = Unix.open_process_out path; verbose }
 
 let send_cmd t cmd = output_string t.channel (cmd^"\n")
