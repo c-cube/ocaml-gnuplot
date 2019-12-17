@@ -26,7 +26,7 @@ From Source
 ### Documentation
 
 The API-documentation of this distribution can be built with `make doc`.
-It can also be found [online](http://ogu.bitbucket.io/gnuplot-ocaml/api/).
+It can also be found [online](https://c-cube.github.io/ocaml-gnuplot/).
 
 ### Examples
 
