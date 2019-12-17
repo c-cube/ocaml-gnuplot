@@ -5,7 +5,11 @@
 Ocaml-Gnuplot provides a simple interface to [Gnuplot](http://www.gnuplot.info)
 from [OCaml](http://www.ocaml.org).  The API supports only 2D graphs and was
 inspired by [FnuPlot](https://github.com/fsprojects/FnuPlot).
-This is a fork of https://bitbucket.org/ogu/gnuplot-ocaml/ .
+
+This is a fork of https://bitbucket.org/ogu/gnuplot-ocaml/ . Changes mainly
+include API changes that are friendlier
+with `module Gp = Gnuplot` (as opposed to `open Gnuplot`),
+moving to `dune` for the build, and removing Core as a dependency.
 
 ## Installation
 
