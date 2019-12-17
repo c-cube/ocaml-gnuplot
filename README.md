@@ -1,4 +1,4 @@
-# Gnuplot-OCaml - Simple interface to Gnuplot
+# Gnuplot-OCaml - Simple interface to Gnuplot [![build status](https://travis-ci.org/c-cube/ocaml-gnuplot.svg?branch=master)](https://travis-ci.org/c-cube/ocaml-gnuplot)
 
 ---------------------------------------------------------------------------
 
