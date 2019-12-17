@@ -2,9 +2,10 @@
 
 ---------------------------------------------------------------------------
 
-Gnuplot-OCaml provides a simple interface to [Gnuplot](http://www.gnuplot.info)
+Ocaml-Gnuplot provides a simple interface to [Gnuplot](http://www.gnuplot.info)
 from [OCaml](http://www.ocaml.org).  The API supports only 2D graphs and was
 inspired by [FnuPlot](https://github.com/fsprojects/FnuPlot).
+This is a fork of https://bitbucket.org/ogu/gnuplot-ocaml/ .
 
 ## Installation
 
@@ -47,7 +48,7 @@ generates the following plot:
 ![Simple Plot](./assets/simple_plot.png)
 
 For more examples please refer to the `examples`-directory of this
-distribution.  You can build the examples with jbuilder, e.g.
+distribution.  You can build the examples with dune, e.g.
 
 ```
 $ dune build examples/gbm_paths.exe

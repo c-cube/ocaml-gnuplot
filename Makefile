@@ -5,4 +5,7 @@ default:
 clean:
 	@dune clean
 
+doc:
+	@dune build @doc
+
 .PHONY: default clean
