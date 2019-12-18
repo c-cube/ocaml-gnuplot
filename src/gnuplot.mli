@@ -74,8 +74,11 @@ module Output : sig
   type t
 
   (** [create ?font output] creates an output type with optional [font]
-      parameter. *)
-  val create :  ?font:string ->
+      parameter, and other custom parameters [params]. *)
+  val create : 
+    ?font:string ->
+    ?size:(int*int) ->
+    ?params:string ->
     [ `Wxt  (** Wxt terminal device generates output in a separate window. *)
     | `X11  (** X11 terminal device for use with X servers. *)
     | `Qt   (** Qt  terminal device generates output in a separate window. *)

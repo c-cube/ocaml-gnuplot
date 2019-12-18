@@ -196,27 +196,33 @@ end
 module Output = struct
   type t = {
     font : string option;
+    size: (int*int) option;
+    params: string option;
     output : Output_type.t;
   }
 
-  let create ?font output = { font; output; }
+  let create ?font ?size ?params output = { font; size; output; params; }
 
   let to_cmd t =
-    let font = t.font |> format_arg (sprintf " font '%s'") in
+    let all_args =
+      (t.font |> format_arg (sprintf " font '%s'")) ^
+      (t.size |> format_arg (fun (x,y) -> sprintf " size %d,%d" x y)) ^
+      (t.params |> format_arg (sprintf " %s"))
+    in
     let output =
       match t.output with
       | `Wxt ->
-        "set term wxt persist"^font
+        "set term wxt persist"^all_args
       | `X11 ->
-        "set term x11 persist"^font
+        "set term x11 persist"^all_args
       | `Qt ->
-        "set term qt persist"^font
+        "set term qt persist"^all_args
       | `Png s ->
-        sprintf "set term png%s\nset output '%s'" font s
+        sprintf "set term png%s\nset output '%s'" all_args s
       | `Png_cairo s ->
-        sprintf "set term pngcairo%s\nset output '%s'" font s
+        sprintf "set term pngcairo%s\nset output '%s'" all_args s
       | `Eps s ->
-        sprintf "set term postscript eps enhanced%s\nset output '%s'" font s
+        sprintf "set term postscript eps enhanced%s\nset output '%s'" all_args s
     in
     { Command.
       command = output;
