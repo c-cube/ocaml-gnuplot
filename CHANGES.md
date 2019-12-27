@@ -1,3 +1,12 @@
+## 0.6
+
+- add more customization to output
+- use travis
+- refactor: remove module `Gp`, put type and functions at toplevel
+- reexport range for easier use without `open` ing the lib
+- remove deps on base,stdio,calendar
+- move to dune
+
 ## 0.5.3
 
 - Move the build system to jbuilder.
