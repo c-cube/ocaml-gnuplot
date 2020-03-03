@@ -203,7 +203,7 @@ module Output = struct
 
   let create ?font ?size ?params output = { font; size; output; params; }
 
-  let to_cmd t =
+  let to_cmd t : Command.t =
     let all_args =
       (t.font |> format_arg (sprintf " font '%s'")) ^
       (t.size |> format_arg (fun (x,y) -> sprintf " size %d,%d" x y)) ^
@@ -406,6 +406,17 @@ module Series = struct
     create ?title ?color ?weight ?fill Candlesticks (Data_DateOHLC data)
 end
 
+module Logscale = struct
+  type t = string * int option
+  let to_cmd : t -> Command.t = function
+    | s, None ->
+      {Command.command=sprintf "set logscale %s" s;
+       cleanup=sprintf "unset logscale %s" s}
+    | s, Some i ->
+      {Command.command=sprintf "set logscale %s %d" s i;
+       cleanup=sprintf "unset logscale %s" s}
+end
+
 type t = {
   channel : out_channel;
   verbose : bool;
@@ -469,7 +480,13 @@ let send_data t data =
     send_cmd t "e"
   | Func _ -> ()
 
-let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels ?timefmtx t =
+let custom_cmd l =
+  { Command.command=String.concat "\n" (List.map fst l);
+    cleanup=String.concat "\n" (List.map snd l);
+  }
+
+let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels
+    ?timefmtx ?logscale ?custom t =
   let commands =
     [ opt_map output ~f:Output.to_cmd
     ; opt_map title ~f:(fun title -> Title.(create ~title () |> to_cmd))
@@ -478,6 +495,8 @@ let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels ?timefmtx
     ; opt_map timefmtx ~f:Timefmtx.to_cmd
     ; opt_map range ~f:Range.to_cmd
     ; opt_map labels ~f:Labels.to_cmd
+    ; opt_map logscale ~f:Logscale.to_cmd
+    ; opt_map custom ~f:custom_cmd
     ] |> list_filter_opt
   in
   List.iter (fun cmd ->
@@ -485,31 +504,34 @@ let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels ?timefmtx
     send_cmd t cmd.Command.command)
     commands 
 
-let set ?output ?title ?use_grid ?fill ?labels t =
-  internal_set ?output ?title ?use_grid ?fill ?labels t
+let set ?output ?title ?use_grid ?fill ?labels ?custom t =
+  internal_set ?output ?title ?use_grid ?fill ?labels ?custom t
 
-let unset ?fill ?labels t =
+let unset ?fill ?labels ?custom t =
   let commands =
     [ opt_map fill ~f:Filling.to_cmd
     ; opt_map labels ~f:Labels.to_cmd
+    ; opt_map custom ~f:custom_cmd
     ] |> list_filter_opt
   in
   List.iter (fun cmd ->
     if not (String.equal cmd.Command.cleanup "") then begin
       if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.cleanup;
       send_cmd t cmd.Command.cleanup
-    end) commands 
+    end) commands
 
-let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
+let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format ?logscale ?custom t data =
   begin match (List.hd data).Series.data with
     | Data_TimeY _ | Data_TimeOHLC _ ->
       let timefmtx = Timefmtx.create ?format timefmt in
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom ~timefmtx t
     | Data_DateY _ | Data_DateOHLC _ ->
       let timefmtx = Timefmtx.create ?format datefmt in
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels ~timefmtx t
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom ~timefmtx t
     | _ ->
-      internal_set ?output ?title ?use_grid ?fill ?range ?labels t
+      internal_set ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom t
+    | exception _ ->
+      invalid_arg "Gp.plot_many: empty data";
   end;
   let cmd =
     "plot \\\n" ^
@@ -518,11 +540,12 @@ let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
   if t.verbose then printf "Command: %s\n%!" cmd;
   send_cmd t cmd;
   List.iter (fun s -> send_data t s.Series.data) data;
-  unset ?fill ?labels t;
+  unset ?fill ?labels ?custom t;
   flush t.channel
 
-let plot ?output ?title ?use_grid ?fill ?range ?labels ?format t data =
-  plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format t [data]
+let plot ?output ?title ?use_grid ?fill ?range ?labels ?format ?logscale ?custom t data =
+  plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format ?logscale ?custom t [data]
 
-let plot_func ?output ?title ?use_grid ?fill ?range ?labels t func =
-  plot_many ?output ?title ?use_grid ?fill ?range ?labels t [Series.lines_func func]
+let plot_func ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom t func =
+  plot_many ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom
+    t [Series.lines_func func]

@@ -75,7 +75,7 @@ module Output : sig
 
   (** [create ?font output] creates an output type with optional [font]
       parameter, and other custom parameters [params]. *)
-  val create : 
+  val create :
     ?font:string ->
     ?size:(int*int) ->
     ?params:string ->
@@ -334,14 +334,17 @@ val with_
   -> (t -> 'a)
   -> 'a
 
-(** [set ?output ?title ?fill t] sets parameters of the Gnuplot
-    session. *)
+(** [set ?output ?title ?fill ?labels ?custom t] sets parameters of the Gnuplot
+    session.
+    @param custom since 0.7 to specify other settings (set/unset pairs)
+*)
 val set
   :  ?output:Output.t  (* Uses Gnuplot's default terminal if not set *)
   -> ?title:string
   -> ?use_grid:bool    (* Defaults to false *)
   -> ?fill:Filling.t
   -> ?labels:Labels.t
+  -> ?custom:(string * string) list
   -> t
   -> unit
 
@@ -349,6 +352,7 @@ val set
 val unset
   :  ?fill:Filling.t
   -> ?labels:Labels.t
+  -> ?custom:(string * string) list
   -> t
   -> unit
 
@@ -362,6 +366,8 @@ val plot
   -> ?range:Range.t
   -> ?labels:Labels.t
   -> ?format:string
+  -> ?logscale:(string * int option)
+  -> ?custom:(string * string) list
   -> t
   -> Series.t
   -> unit
@@ -376,6 +382,8 @@ val plot_many
   -> ?range:Range.t
   -> ?labels:Labels.t
   -> ?format:string
+  -> ?logscale:(string * int option)
+  -> ?custom:(string * string) list
   -> t
   -> Series.t list
   -> unit
@@ -390,6 +398,8 @@ val plot_func
   -> ?fill:Filling.t
   -> ?range:Range.t
   -> ?labels:Labels.t
+  -> ?logscale:(string * int option)
+  -> ?custom:(string * string) list
   -> t
   -> string
   -> unit
