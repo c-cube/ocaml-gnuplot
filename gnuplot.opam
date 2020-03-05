@@ -5,7 +5,7 @@ homepage: "https://github.com/c-cube/ocaml-gnuplot"
 bug-reports: "https://github.com/c-cube/ocaml-gnuplot/issues"
 dev-repo: "git+https://github.com/c-cube/ocaml-gnuplot.git"
 license: "LGPL-2.1+ with OCaml linking exception"
-version: "0.6"
+version: "0.7"
 build: [
   ["dune" "build" "-p" name "-j" jobs]
   ["dune" "build" "-p" name "-j" jobs "@doc"] {with-doc}

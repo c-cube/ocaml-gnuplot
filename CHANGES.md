@@ -1,3 +1,8 @@
+
+## 0.7
+
+- add `custom` and `logscale` options to plot
+
 ## 0.6
 
 - add more customization to output
