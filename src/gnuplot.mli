@@ -95,6 +95,16 @@ module Labels : sig
   val create :  ?x:string -> ?y:string -> unit -> t
 end
 
+(** The representation of data-arrays (cf. the {!Series} module). *)
+type data =
+  | Data_Y of float list
+  | Data_XY of (float * float) list
+  | Data_TimeY of (time * float) list * timezone
+  | Data_DateY of (date * float) list
+  | Data_TimeOHLC of (time * (float * float * float * float)) list * timezone
+  | Data_DateOHLC of (date * (float * float * float * float)) list
+  | Func of string
+
 module Series : sig
   (** Represents a series of data for the plot functions in the [Gp] module. *)
   type t
@@ -306,6 +316,9 @@ module Series : sig
     -> ?fill:Filling.t
     -> (date * (float * float * float * float)) list
     -> t
+
+  (** Low-level, unsafe, interface, please see implementation. *)
+  val custom: string -> data -> t
 end
 
 (** {2 Main interface} *)
