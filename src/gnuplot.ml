@@ -313,6 +313,8 @@ module Series = struct
     data : data;
   }
 
+  let custom cmd data = {cmd; data}
+
   let create ?title ?color ?weight ?fill kind data =
     let kind_text =
       match kind with
