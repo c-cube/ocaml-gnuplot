@@ -297,10 +297,12 @@ type kind =
   | Steps
   | Histogram
   | Candlesticks
+  | Filledcurves of string
 
 type data =
   | Data_Y of float list
   | Data_XY of (float * float) list
+  | Data_XYZ of (float * float * float) list
   | Data_TimeY of (time * float) list * timezone
   | Data_DateY of (date * float) list
   | Data_TimeOHLC of (time * (float * float * float * float)) list * timezone
@@ -324,6 +326,7 @@ module Series = struct
       | Steps -> "steps"
       | Histogram -> "histogram"
       | Candlesticks -> "candlesticks"
+      | Filledcurves what -> "filledcurves " ^ what
     in
     let cmd =
       String.concat "" [
@@ -331,6 +334,8 @@ module Series = struct
          | Data_Y _ -> " '-' using 1 with " ^ kind_text
          | Data_XY _ | Data_TimeY _ | Data_DateY _ ->
            " '-' using 1:2 with " ^ kind_text
+         | Data_XYZ _ ->
+           " '-' using 1:2:3 with " ^ kind_text
          | Data_TimeOHLC _ | Data_DateOHLC _ ->
            " '-' using 1:2:3:4:5 with " ^ kind_text
          | Func f -> f ^ " with " ^ kind_text)
@@ -406,6 +411,10 @@ module Series = struct
 
   let candles_date_ohlc ?title ?color ?weight ?fill data =
     create ?title ?color ?weight ?fill Candlesticks (Data_DateOHLC data)
+
+  let filledcurves ?title ?color ?weight ?fill ?(filledopt="") data =
+    create ?title ?color ?weight ?fill (Filledcurves filledopt)
+      (Data_XYZ data)
 end
 
 module Logscale = struct
@@ -450,6 +459,11 @@ let send_data t data =
   | Data_XY data ->
     List.iter (fun (x, y) ->
         send_cmd t (format_num x ^" "^ format_num y))
+      data;
+    send_cmd t "e"
+  | Data_XYZ data ->
+    List.iter (fun (x, y, z) ->
+        send_cmd t (format_num x ^" "^ format_num y ^" "^format_num z))
       data;
     send_cmd t "e"
   | Data_TimeY (data, zone) ->

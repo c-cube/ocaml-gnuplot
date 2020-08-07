@@ -99,6 +99,7 @@ end
 type data =
   | Data_Y of float list
   | Data_XY of (float * float) list
+  | Data_XYZ of (float * float * float) list
   | Data_TimeY of (time * float) list * timezone
   | Data_DateY of (date * float) list
   | Data_TimeOHLC of (time * (float * float * float * float)) list * timezone
@@ -305,6 +306,15 @@ module Series : sig
     -> ?fill:Filling.t
     -> zone:timezone
     -> (time * (float * float * float * float)) list
+    -> t
+
+  val filledcurves
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> ?fill:Filling.t
+    -> ?filledopt:string
+    -> (float * float * float) list
     -> t
 
   (** [candles_date_ohlc data] creates a data series for a candlestick chart
