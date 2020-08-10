@@ -189,6 +189,7 @@ module Output_type = struct
     | `X11
     | `Qt
     | `Png of string | `Png_cairo of string
+    | `Svg of string
     | `Eps of string
     ]
 end
@@ -221,6 +222,8 @@ module Output = struct
         sprintf "set term png%s\nset output '%s'" all_args s
       | `Png_cairo s ->
         sprintf "set term pngcairo%s\nset output '%s'" all_args s
+      | `Svg s ->
+        sprintf "set term svg%s\nset output '%s'" all_args s
       | `Eps s ->
         sprintf "set term postscript eps enhanced%s\nset output '%s'" all_args s
     in

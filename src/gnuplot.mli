@@ -84,6 +84,7 @@ module Output : sig
     | `Qt   (** Qt  terminal device generates output in a separate window. *)
     | `Png of string  (** For saving charts to a PNG file. *)
     | `Png_cairo of string  (** Same as [`Png], but uses Cairo libs for rendering. *)
+    | `Svg of string
     | `Eps of string  (** For saving charts to an EPS file. *)
     ] -> t
 end
