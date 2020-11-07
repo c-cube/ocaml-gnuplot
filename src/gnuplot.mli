@@ -48,6 +48,7 @@ module Range : sig
     | X  of float * float
     | Y  of float * float
     | XY of float * float * float * float (** arguments are [x1, x2, y1, y2] *)
+    | XYZ of float * float * float * float * float * float (** arguments are [x1, x2, y1, y2, z1, z2] *)
     | Date of date * date
     | Time of time * time * timezone
     | Local_time of time * time  (** Time range in local time zone. *)
@@ -57,6 +58,7 @@ type range = Range.t =
   | X  of float * float
   | Y  of float * float
   | XY of float * float * float * float (** arguments are [x1, x2, y1, y2] *)
+  | XYZ of float * float * float * float * float * float (** arguments are [x1, x2, y1, y2, z1, z2] *)
   | Date of date * date
   | Time of time * time * timezone
   | Local_time of time * time  (** Time range in local time zone. *)
@@ -96,14 +98,18 @@ module Labels : sig
 end
 
 (** The representation of data-arrays (cf. the {!Series} module). *)
-type data =
-  | Data_Y of float list
-  | Data_XY of (float * float) list
-  | Data_TimeY of (time * float) list * timezone
-  | Data_DateY of (date * float) list
-  | Data_TimeOHLC of (time * (float * float * float * float)) list * timezone
-  | Data_DateOHLC of (date * (float * float * float * float)) list
-  | Func of string
+type dim2 = Dim2
+type dim3 = Dim3
+
+type 'dim data =
+  | Data_Y : float list -> dim2 data
+  | Data_XY : (float * float) list -> dim2 data
+  | Data_XYZ : (float * float * float) list -> dim3 data
+  | Data_TimeY : (time * float) list * timezone -> dim2 data
+  | Data_DateY : (date * float) list -> dim2 data
+  | Data_TimeOHLC : (time * (float * float * float * float)) list * timezone -> dim2 data
+  | Data_DateOHLC : (date * (float * float * float * float)) list -> dim2 data
+  | Func : string -> dim2 data
 
 module Series : sig
   (** Represents a series of data for the plot functions in the [Gp] module. *)
@@ -318,7 +324,40 @@ module Series : sig
     -> t
 
   (** Low-level, unsafe, interface, please see implementation. *)
-  val custom: string -> data -> t
+  val custom: string -> dim2 data -> t
+end
+
+module Splots :
+sig
+  (** Represents the data for the splot functions in the [Gp] module. *)
+  type t
+
+  (** [lines_xyz] creates a XYZ line plot. *)
+  val lines_xyz
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (float * float * float) list
+    -> t
+
+  (** [points_xyz] creates a scatter plot. *)
+  val points_xyz
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (float * float * float) list
+    -> t
+
+  (** [points_xyz] creates a XYZ points and lines plot. *)
+  val linespoints_xyz
+    :  ?title:string
+    -> ?color:Color.t
+    -> ?weight:int
+    -> (float * float * float) list
+    -> t
+
+  (** Low-level, unsafe, interface, please see implementation. *)
+  val custom: string -> dim3 data -> t
 end
 
 (** {2 Main interface} *)
@@ -415,4 +454,34 @@ val plot_func
   -> ?custom:(string * string) list
   -> t
   -> string
+  -> unit
+
+(** [splot t s] creates a 3d plot for [s]. The parameters for filling,
+    range, etc are optional. *)
+val splot
+  :  ?output:Output.t
+  -> ?title:string
+  -> ?use_grid:bool
+  -> ?fill:Filling.t
+  -> ?range:Range.t
+  -> ?labels:Labels.t
+  -> ?logscale:(string * int option)
+  -> ?custom:(string * string) list
+  -> t
+  -> Splots.t
+  -> unit
+
+(** [splot_many t ls] creates a 3d plot for the list of data [ls].
+    The parameters for filling, range, etc are optional. *)
+val splot_many
+  :  ?output:Output.t
+  -> ?title:string
+  -> ?use_grid:bool
+  -> ?fill:Filling.t
+  -> ?range:Range.t
+  -> ?labels:Labels.t
+  -> ?logscale:(string * int option)
+  -> ?custom:(string * string) list
+  -> t
+  -> Splots.t list
   -> unit
