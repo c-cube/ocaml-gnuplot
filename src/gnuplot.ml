@@ -116,20 +116,22 @@ module Range = struct
     | X  of float * float
     | Y  of float * float
     | XY of float * float * float * float
+    | XYZ of float * float * float * float * float * float
     | Date of date * date
     | Time of time * time * timezone
     | Local_time of time * time
 
-  let range ?xspec ?yspec () =
-    let sep = match xspec, yspec with
-      | Some _, Some _ -> "\n"
-      | _, _ -> ""
-    in
+  let range ?xspec ?yspec ?zspec () =
+    let count x =
+      match x with None -> 0 | Some _ -> 1 in
+    let total = count xspec + count yspec + count zspec in
+    let sep = if total > 1 then "\n" else "" in
     let xspec = format_arg (sprintf "set xrange %s") xspec in
     let yspec = format_arg (sprintf "set yrange %s") yspec in
+    let zspec = format_arg (sprintf "set zrange %s") zspec in
     { Command.
-      command = String.concat sep [xspec; yspec];
-      cleanup = "set autoscale xy";
+      command = String.concat sep [xspec; yspec; zspec];
+      cleanup = "set autoscale xyz";
     }
 
   let to_cmd t =
@@ -146,6 +148,12 @@ module Range = struct
       range
         ~xspec:(sprintf "[%s:%s]" (format_num x1) (format_num x2))
         ~yspec:(sprintf "[%s:%s]" (format_num y1) (format_num y2))
+        ()
+    | XYZ (x1, x2, y1, y2, z1, z2) ->
+      range
+        ~xspec:(sprintf "[%s:%s]" (format_num x1) (format_num x2))
+        ~yspec:(sprintf "[%s:%s]" (format_num y1) (format_num y2))
+        ~zspec:(sprintf "[%s:%s]" (format_num z1) (format_num z2))
         ()
     | Date (d1, d2) ->
       range
@@ -166,6 +174,7 @@ type range = Range.t =
   | X  of float * float
   | Y  of float * float
   | XY of float * float * float * float (** arguments are [x1, x2, y1, y2] *)
+  | XYZ of float * float * float * float * float * float (** arguments are [x1, x2, y1, y2, z1, z2] *)
   | Date of date * date
   | Time of time * time * timezone
   | Local_time of time * time  (** Time range in local time zone. *)
@@ -298,19 +307,23 @@ type kind =
   | Histogram
   | Candlesticks
 
-type data =
-  | Data_Y of float list
-  | Data_XY of (float * float) list
-  | Data_TimeY of (time * float) list * timezone
-  | Data_DateY of (date * float) list
-  | Data_TimeOHLC of (time * (float * float * float * float)) list * timezone
-  | Data_DateOHLC of (date * (float * float * float * float)) list
-  | Func of string
+type dim2 = Dim2
+type dim3 = Dim3
+
+type 'dim data =
+  | Data_Y : float list -> dim2 data
+  | Data_XY : (float * float) list -> dim2 data
+  | Data_XYZ : (float * float * float) list -> dim3 data
+  | Data_TimeY : (time * float) list * timezone -> dim2 data
+  | Data_DateY : (date * float) list -> dim2 data
+  | Data_TimeOHLC : (time * (float * float * float * float)) list * timezone -> dim2 data
+  | Data_DateOHLC : (date * (float * float * float * float)) list -> dim2 data
+  | Func : string -> dim2 data
 
 module Series = struct
   type t = {
     cmd : string;
-    data : data;
+    data : dim2 data;
   }
 
   let custom cmd data = {cmd; data}
@@ -419,6 +432,46 @@ module Logscale = struct
        cleanup=sprintf "unset logscale %s" s}
 end
 
+module Splots = struct
+
+  type t = {
+      cmd : string ;
+      data : dim3 data
+    }
+
+  let custom cmd data = {cmd; data}
+
+  let create ?title ?color ?weight ?fill kind data =
+    let kind_text =
+      match kind with
+      | Lines -> "lines"
+      | Points -> "points"
+      | Linespoints -> "linespoints"
+      | Steps -> "steps"
+      | Histogram -> "histogram"
+      | Candlesticks -> "candlesticks"
+    in
+    let cmd =
+      String.concat "" [
+          (match data with
+           | Data_XYZ _ -> " '-' using 1:2:3 with " ^ kind_text)
+        ; format_title title
+        ; format_num_arg "lw" weight
+        ; format_color "lc" color
+        ; format_fill fill ]
+    in
+    { cmd; data; }
+
+  let lines_xyz ?title ?color ?weight data =
+    create ?title ?color ?weight Lines (Data_XYZ data)
+
+  let points_xyz ?title ?color ?weight data =
+    create ?title ?color ?weight Points (Data_XYZ data)
+
+  let linespoints_xyz ?title ?color ?weight data =
+    create ?title ?color ?weight Linespoints (Data_XYZ data)
+end
+
 type t = {
   channel : out_channel;
   verbose : bool;
@@ -442,7 +495,7 @@ let with_ ?verbose ?path f =
     close c;
     raise e
 
-let send_data t data =
+let send_data (type dim) t (data : dim data) =
   match data with
   | Data_Y data ->
     List.iter (fun y -> send_cmd t (format_num y)) data;
@@ -450,6 +503,11 @@ let send_data t data =
   | Data_XY data ->
     List.iter (fun (x, y) ->
         send_cmd t (format_num x ^" "^ format_num y))
+      data;
+    send_cmd t "e"
+  | Data_XYZ data ->
+    List.iter (fun (x, y, z) ->
+        send_cmd t (format_num x ^" "^ format_num y ^" "^ format_num z))
       data;
     send_cmd t "e"
   | Data_TimeY (data, zone) ->
@@ -504,7 +562,7 @@ let internal_set ?output ?title ?(use_grid=false) ?fill ?range ?labels
   List.iter (fun cmd ->
     if t.verbose then printf "Setting:\n%s\n%!" cmd.Command.command;
     send_cmd t cmd.Command.command)
-    commands 
+    commands
 
 let set ?output ?title ?use_grid ?fill ?labels ?custom t =
   internal_set ?output ?title ?use_grid ?fill ?labels ?custom t
@@ -546,8 +604,23 @@ let plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format ?logscale ?c
   flush t.channel
 
 let plot ?output ?title ?use_grid ?fill ?range ?labels ?format ?logscale ?custom t data =
-  plot_many ?output ?title ?use_grid ?fill ?range ?labels  ?format ?logscale ?custom t [data]
+  plot_many ?output ?title ?use_grid ?fill ?range ?labels ?format ?logscale ?custom t [data]
 
 let plot_func ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom t func =
   plot_many ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom
     t [Series.lines_func func]
+
+let splot_many ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom t data =
+  internal_set ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom t ;
+  let cmd =
+    "splot \\\n" ^
+    (List.map (fun s -> s.Splots.cmd) data |> String.concat ", \\\n")
+  in
+  if t.verbose then printf "Command: %s\n%!" cmd;
+  send_cmd t cmd;
+  List.iter (fun s -> send_data t s.Splots.data) data;
+  unset ?fill ?labels ?custom t;
+  flush t.channel
+
+let splot ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom t data =
+  splot_many ?output ?title ?use_grid ?fill ?range ?labels ?logscale ?custom t [data]
